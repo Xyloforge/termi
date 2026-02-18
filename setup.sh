@@ -89,7 +89,7 @@ install_core() {
             # Create sudo shim if missing (Alpine often runs as root, or user without sudo)
             if ! command -v sudo &> /dev/null; then
                  log_warn "'sudo' not found. Assuming running as root."
-                 alias sudo=""
+                 sudo() { "$@"; }
             fi
             
             sudo apk update
