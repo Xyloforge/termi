@@ -21,7 +21,7 @@ Automated setup that installs **WSL (Alpine Linux)**, **Alacritty**, and **Nerd 
 1.  Open **PowerShell as Administrator**.
 2.  Clone the repo:
     ```powershell
-    git clone https://github.com/your-username/termi $HOME\termi
+    git clone git@github.com:Xyloforge/termi.git $HOME\termi
     cd $HOME\termi
     ```
 3.  Run the installer:
