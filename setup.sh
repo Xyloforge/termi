@@ -83,8 +83,29 @@ install_core() {
         fi
     elif [ "$OS" = "Linux" ]; then
         log_info "Linux detected."
+        # Check for apk (Alpine Linux)
+        if command -v apk &> /dev/null; then
+            log_info "Alpine Linux detected (apk)."
+            # Create sudo shim if missing (Alpine often runs as root, or user without sudo)
+            if ! command -v sudo &> /dev/null; then
+                 log_warn "'sudo' not found. Assuming running as root."
+                 alias sudo=""
+            fi
+            
+            sudo apk update
+            # Core tools
+            sudo apk add tmux zsh git fzf bat
+            # Optional: Alacritty (only if you plan to run GUI from WSL, mostly unused for headless)
+            # sudo apk add alacritty || true 
+            
+            # Change default shell to zsh if not already
+            if [[ "$SHELL" != *"/zsh" ]]; then
+                 log_info "Changing default shell to zsh..."
+                 sed -i "s|$USER:.*|$USER:/bin/zsh|g" /etc/passwd || true
+            fi
+
         # Check for apt-get (Debian/Ubuntu/WSL)
-        if command -v apt-get &> /dev/null; then
+        elif command -v apt-get &> /dev/null; then
             sudo apt-get update
             sudo apt-get install -y alacritty tmux fzf bat
             
@@ -242,7 +263,9 @@ uninstall_core() {
             brew uninstall tmux
         elif [ "$OS" = "Linux" ]; then
             log_info "Uninstalling packages..."
-            if command -v apt-get &> /dev/null; then
+            if command -v apk &> /dev/null; then
+                 sudo apk del alacritty tmux fzf bat
+            elif command -v apt-get &> /dev/null; then
                 sudo apt-get remove -y alacritty tmux
             fi
         fi
