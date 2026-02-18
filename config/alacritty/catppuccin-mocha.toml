@@ -1,0 +1,80 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Zenith — A Color Psychology-Driven Terminal Theme          ║
+# ║  Based on Catppuccin Mocha, tuned for focus & motivation    ║
+# ║                                                             ║
+# ║  Psychology:                                                ║
+# ║  • Deep background → reduces eye strain, creates depth      ║
+# ║  • Gold/Amber accents → warmth, achievement, motivation     ║
+# ║  • Soft greens → growth, progress, calm energy              ║
+# ║  • Lavender text → focus, clarity without harshness         ║
+# ║  • Muted reds → only errors, avoids anxiety                 ║
+# ║  • High contrast where it matters, soft everywhere else     ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+[colors.primary]
+background = "#11111B"          # Catppuccin Crust — deepest, immersive
+foreground = "#CDD6F4"          # Lavender-white — easy on eyes, high readability
+dim_foreground = "#585B70"      # Surface2 — fades inactive content away
+bright_foreground = "#F5E0DC"   # Rosewater — warm bright, not harsh white
+
+[colors.cursor]
+text = "#11111B"
+cursor = "#F9E2AF"              # Gold cursor — always visible, warm beacon
+
+[colors.vi_mode_cursor]
+text = "#11111B"
+cursor = "#A6E3A1"              # Green in vi mode — "go mode", action
+
+[colors.search.matches]
+foreground = "#11111B"
+background = "#F9E2AF"          # Gold highlights — achievement, discovery
+
+[colors.search.focused_match]
+foreground = "#11111B"
+background = "#A6E3A1"          # Green focused — confirms "found it"
+
+[colors.footer_bar]
+foreground = "#11111B"
+background = "#B4BEFE"          # Lavender — calm informational
+
+[colors.hints.start]
+foreground = "#11111B"
+background = "#F9E2AF"          # Gold — draws attention gently
+
+[colors.hints.end]
+foreground = "#11111B"
+background = "#585B70"          # Muted — fades after attention captured
+
+[colors.selection]
+text = "#11111B"
+background = "#B4BEFE"          # Lavender selection — calm, clear
+
+[colors.normal]
+black   = "#313244"             # Surface0 — subtle, not harsh
+red     = "#F2CDCD"             # Flamingo (softened red) — less alarming
+green   = "#A6E3A1"             # Green — growth, success, go
+yellow  = "#F9E2AF"             # Gold — warm, motivating
+blue    = "#89B4FA"             # Blue — trust, stability
+magenta = "#CBA6F7"             # Mauve — creativity, depth
+cyan    = "#94E2D5"             # Teal — refreshing clarity
+white   = "#BAC2DE"             # Subtext1 — soft, not blinding
+
+[colors.bright]
+black   = "#45475A"             # Surface1
+red     = "#F38BA8"             # True red only when bright/important
+green   = "#A6E3A1"
+yellow  = "#F9E2AF"
+blue    = "#89B4FA"
+magenta = "#F5C2E7"             # Pink — creative energy burst
+cyan    = "#94E2D5"
+white   = "#CDD6F4"             # Full lavender-white
+
+[colors.dim]
+black   = "#1E1E2E"             # Base — barely visible
+red     = "#45475A"             # Dimmed red — nearly invisible, no anxiety
+green   = "#585B70"
+yellow  = "#585B70"
+blue    = "#45475A"
+magenta = "#45475A"
+cyan    = "#45475A"
+white   = "#6C7086"             # Overlay0 — whisper quiet
