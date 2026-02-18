@@ -83,12 +83,19 @@ install_core() {
         fi
     elif [ "$OS" = "Linux" ]; then
         log_info "Linux detected."
+        # Check for apt-get (Debian/Ubuntu/WSL)
         if command -v apt-get &> /dev/null; then
             sudo apt-get update
             sudo apt-get install -y alacritty tmux fzf bat
-            log_warn "Please ensure JetBrainsMono Nerd Font is installed manually on Linux."
+            
+            # WSL 2 Check: Fonts often need to be installed in Windows, not just Linux subsys
+            if grep -q "microsoft" /proc/version 2>/dev/null; then
+                 log_warn "WSL detected: You must install 'JetBrainsMono Nerd Font' on Windows manually!"
+            else
+                 log_warn "Please ensure 'JetBrainsMono Nerd Font' is installed manually on your system."
+            fi
         else
-            log_warn "Unsupported package manager. Please install 'alacritty' and 'tmux' manually."
+            log_warn "Unsupported package manager (not apt). Please install 'alacritty', 'tmux', 'fzf', 'bat' manually."
         fi
     fi
 
@@ -116,9 +123,21 @@ install_core() {
     log_info "Linking custom configurations..."
     
     # Alacritty
+    # Alacritty
     mkdir -p "$CONFIG_DIR/alacritty"
-    ln -sf "$REPO_DIR/config/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    
+    # Link Common & Theme
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
     ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
+
+    # Link Platform Specific Config
+    if [ "$OS" = "Darwin" ]; then
+        log_info "Linking macOS Alacritty config..."
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    else
+        log_info "Linking Linux/WSL Alacritty config..."
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    fi
     
     # Tmux
     mkdir -p "$CONFIG_DIR/tmux"
@@ -242,8 +261,15 @@ update_core() {
     log_info "Refreshing symlinks..."
     mkdir -p "$CONFIG_DIR/alacritty" "$CONFIG_DIR/tmux" "$CONFIG_DIR/btop/themes"
 
-    ln -sf "$REPO_DIR/config/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
     ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
+    
+    OS="$(uname -s)"
+    if [ "$OS" = "Darwin" ]; then
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    else
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+    fi
     ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
     ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
