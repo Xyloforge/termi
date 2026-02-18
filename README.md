@@ -1,55 +1,56 @@
-# Termi Migration Kit
+# Termi: The Ultimate Minimalist Terminal
+**Alacritty + Tmux + Zsh** — A unified, high-performance terminal environment that works identically on macOS, Linux, and Windows.
 
-This repository migrates your terminal workflow from WezTerm to **Alacritty + Tmux**, maintaining your existing shortcuts and design.
+## 🚀 Installation
 
-## Features
-- **Alacritty**: GPU-accelerated, Catppuccin Mocha theme, JetBrains Mono Nerd Font.
-- **Tmux**: `Ctrl+Space` prefix, mouse support, persistence (resurrect/continuum).
-- **Keybinds**: WezTerm-like shortcuts (`Cmd+D` split, `Cmd+W` close, `Cmd+H/J/K/L` resize) mapped to Tmux.
+### 🍎 macOS & 🐧 Linux
+Runs the universal setup script. Detects OS, installs dependencies (brew/apt/apk), links configs, and sets up Zsh.
 
-## Installation
+1.  **Clone & Run:**
+    ```bash
+    git clone https://github.com/your-username/termi ~/.termi
+    cd ~/.termi
+    ./setup.sh install
+    ```
 
-### 1. Clone
-Clone this repo to a permanent location (e.g., `~/dotfiles` or `~/termi-migration`).
-```bash
-# If you haven't already:
-# git clone <your-repo-url> ~/termi-migration
-# cd ~/termi-migration
-```
+2.  **Restart**: Close your current terminal and open **Alacritty**.
 
-### 2. Install
-Run the installer. It backs up nothing, but uses symlinks, so your original files (if in other paths) are safe.
+### 🪟 Windows (Native-Feel)
+Automated setup that installs **WSL (Alpine Linux)**, **Alacritty**, and **Nerd Fonts** for you. No manual work required.
 
-**Supported OS:**
-- **macOS**: Installs via Homebrew.
-- **Linux (Debian/Ubuntu)**: Installs via `apt`.
-- **Windows (WSL2)**: Treated as Linux. Ensure you are running this inside your WSL terminal (Ubuntu recommended).
+1.  Open **PowerShell as Administrator**.
+2.  Clone the repo:
+    ```powershell
+    git clone https://github.com/your-username/termi $HOME\termi
+    cd $HOME\termi
+    ```
+3.  Run the installer:
+    ```powershell
+    .\install_windows.ps1
+    ```
+4.  **Done**: Initial setup happens automatically inside the lightweight Linux environment. Open **Alacritty** from your Start Menu.
 
-```bash
-chmod +x install.sh
-./install.sh
-```
+---
 
-### 3. Finalize Tmux
-Open Alacritty (which will auto-start Tmux).
-Press `Ctrl + Space` then `I` (Shift + i) to verify and install Tmux plugins.
+## ⌨️ Keybind Cheat Sheet
 
-## Keybind Cheat Sheet
-| Action | Keybind (Mac) | Equivalent Tmux |
-|--------|---------------|-----------------|
-| Split Side-by-Side (Horiz) | `Cmd + D` | `Prefix + %` |
-| Split Top-Bottom (Vert) | `Cmd + Shift + D` | `Prefix + "` |
-| New Window | `Cmd + Y` | `Prefix + c` |
-| Close Pane | `Cmd + W` | `Prefix + x` |
-| Close Window | `Cmd + Shift + W` | `Prefix + &` |
-| Resize Pane | `Cmd + H/J/K/L` | `Prefix + H/J/K/L` |
-| Window Selector | `Cmd + P` | `Prefix + w` |
-| Rename Tab | `Cmd + Shift + R` | `Prefix + ,` |
+| Action | macOS | Windows / Linux |
+| :--- | :--- | :--- |
+| **New Tab** | `Cmd + T` | `Ctrl + T` |
+| **Close Tab** | `Cmd + W` | `Alt + Shift + W` |
+| **Split Right** | `Cmd + D` | `Alt + D` |
+| **Split Down** | `Cmd + Shift + D` | `Alt + Shift + D` |
+| **Navigate Panes** | `Cmd + H/J/K/L` | `Alt + H/J/K/L` |
+| **Maximize Pane** | `Cmd + F` | `Alt + F` |
+| **Rename Tab** | `Cmd + Shift + R` | `Alt + Shift + R` |
+| **Copy** | `Cmd + C` | `Ctrl + Shift + C` |
+| **Paste** | `Cmd + V` | `Ctrl + Shift + V` |
 
-## Troubleshooting
-- **Fonts**: If icons don't show up, ensure `JetBrainsMono Nerd Font` is installed. The script tries to install it via homebrew.
-- **Tmux Colors**: If colors look dull, ensure Alacritty is setting `TERM` to `xterm-256color` (default in this config).
-- **"Alacritty can't be opened"**: This is normal for open-source apps on macOS. Fix it by running:
-  ```bash
-  sudo xattr -r -d com.apple.quarantine /Applications/Alacritty.app
-  ```
+> **Note**: On Windows/Linux, we use `Alt` for window management to avoid conflicts with system shortcuts (like `Win+Arrow` or `Ctrl+C`).
+
+## 🛠 Management
+The `setup.sh` script is your central tool for managing the config.
+
+- **Update Configs**: `./setup.sh update` (Pull changes & refresh symlinks)
+- **Uninstall**: `./setup.sh uninstall` (Remove all configs & restore shell)
+- **Install VS Code Theme**: `./setup.sh vscode` (Installs extensions)
