@@ -91,3 +91,8 @@ _ccat_func() {
   cat "$@" | pbcopy
   echo '✅ Copied to clipboard!'
 }
+# 7. Zoxide (Smarter cd)
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+    alias cd='z'
+fi
