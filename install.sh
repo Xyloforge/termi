@@ -97,9 +97,15 @@ echo "🔗 Linking custom configurations..."
 
 # Alacritty
 mkdir -p "$CONFIG_DIR/alacritty"
-# Link alacritty.toml
-ln -sf "$REPO_DIR/config/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
-# Link theme file
+# Link alacritty.toml (Using OS-specific config as main entry point)
+if [ "$OS" = "Darwin" ]; then
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+else
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+fi
+
+# Link imported common configs
+ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
 ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
 
 # Tmux
