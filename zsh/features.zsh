@@ -85,3 +85,9 @@ elif command -v htop &> /dev/null; then
 else
     alias monitor='top'
 fi
+# 6. Clipboard Integration (ccat: cat + copy)
+alias ccat='_ccat_func'
+_ccat_func() {
+  cat "$@" | pbcopy
+  echo '✅ Copied to clipboard!'
+}
