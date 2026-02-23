@@ -44,11 +44,18 @@ if [ "$OS" = "Darwin" ]; then
     brew_cask_install alacritty
     brew_cask_install font-jetbrains-mono-nerd-font
     
+    # Add taps
+    brew tap kopecmaciej/vi-mongo
+    brew tap honhimW/tap
+
     # Install Tmux & Tools
     brew_install tmux
     brew_install fzf
     brew_install bat
     brew_install btop
+    brew_install lazysql
+    brew_install vi-mongo
+    brew_install ratisui
 
     # Fix "App can't be opened" error for Alacritty (Code Signing / Quarantine)
     if [ -d "/Applications/Alacritty.app" ]; then

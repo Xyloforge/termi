@@ -95,3 +95,19 @@ _ccat_func() {
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init zsh)"
 fi
+
+# 8. Database Management TUI 
+if command -v lazysql &> /dev/null; then
+    alias lsql='lazysql'
+    alias dbs='lazysql'
+fi
+
+if command -v vi-mongo &> /dev/null; then
+    alias vmongo='vi-mongo'
+    alias mgo='vi-mongo'
+fi
+
+if command -v ratisui &> /dev/null; then
+    alias rtui='ratisui'
+    alias redis='ratisui'
+fi
