@@ -53,6 +53,7 @@ if [ "$OS" = "Darwin" ]; then
     brew_install fzf
     brew_install bat
     brew_install btop
+    brew_install zoxide
     brew_install lazysql
     brew_install vi-mongo
     brew_install ratisui
@@ -71,8 +72,27 @@ elif [ "$OS" = "Linux" ]; then
     # Simple check for apt
     if command -v apt-get &> /dev/null; then
         sudo apt-get update
-        sudo apt-get install -y alacritty tmux fzf bat
-        echo "⚠️  Please ensure JetBrainsMono Nerd Font is installed manually on Linux."
+        sudo apt-get install -y alacritty tmux fzf bat btop zoxide wget unzip fontconfig
+        
+        echo "📦 Handling JetBrainsMono Nerd Font..."
+        FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+        if [ ! -d "$FONT_DIR" ]; then
+            echo "   - Downloading and extracting JetBrainsMono Nerd Font..."
+            mkdir -p "$FONT_DIR"
+            TEMP_DIR=$(mktemp -d)
+            if wget -qO "$TEMP_DIR/JetBrainsMono.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"; then
+                unzip -qo "$TEMP_DIR/JetBrainsMono.zip" -d "$FONT_DIR"
+                fc-cache -fv &> /dev/null
+                echo "   ✅ JetBrainsMono Nerd Font installed."
+            else
+                echo "   ⚠️ Failed to download JetBrainsMono Nerd Font. Please install manually."
+            fi
+            rm -rf "$TEMP_DIR"
+        else
+            echo "   - JetBrainsMono Nerd Font directory already exists."
+        fi
+
+        echo "⚠️  lazysql, vi-mongo, and ratisui are not in standard apt repos. Recommend installing Homebrew on Linux to get them."
     else
         echo "⚠️  Unsupported package manager. Please install 'alacritty' and 'tmux' manually."
     fi
@@ -104,6 +124,11 @@ echo "🔗 Linking custom configurations..."
 
 # Alacritty
 mkdir -p "$CONFIG_DIR/alacritty"
+# Backup existing Alacritty config if not a symlink
+if [ -f "$CONFIG_DIR/alacritty/alacritty.toml" ] && [ ! -L "$CONFIG_DIR/alacritty/alacritty.toml" ]; then
+    echo "   - Backing up existing alacritty.toml to alacritty.toml.bak"
+    mv "$CONFIG_DIR/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml.bak"
+fi
 # Link alacritty.toml (Using OS-specific config as main entry point)
 if [ "$OS" = "Darwin" ]; then
     ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
@@ -117,6 +142,11 @@ ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty
 
 # Tmux
 mkdir -p "$CONFIG_DIR/tmux"
+# Backup existing Tmux config if not a symlink
+if [ -f "$CONFIG_DIR/tmux/tmux.conf" ] && [ ! -L "$CONFIG_DIR/tmux/tmux.conf" ]; then
+    echo "   - Backing up existing tmux.conf to tmux.conf.bak"
+    mv "$CONFIG_DIR/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf.bak"
+fi
 # Link tmux.conf
 ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
 
@@ -139,6 +169,14 @@ AUTO_TMUX_SNIPPET="$REPO_DIR/zsh/auto-tmux.zsh"
 FEATURES_SNIPPET="$REPO_DIR/zsh/features.zsh"
 
 echo "🐚 Configure Zsh..."
+
+# Safely ensure .zshrc exists
+if [ ! -f "$ZSHRC" ]; then
+    touch "$ZSHRC"
+fi
+
+# Backup existing .zshrc safely
+cp "$ZSHRC" "${ZSHRC}.bak"
 
 # 4.1 Auto-Tmux
 if grep -q "Auto-Tmux Configuration" "$ZSHRC"; then

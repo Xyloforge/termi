@@ -109,5 +109,23 @@ fi
 
 if command -v ratisui &> /dev/null; then
     alias rtui='ratisui'
-    alias redis='ratisui'
 fi
+
+# 9. Port / Process Search
+alias pfzf='lsof -i | fzf'
+
+# 10. Kill Process by Port
+killport() {
+    if [ -z "$1" ]; then
+        echo "Usage: killport <port_number>"
+        return 1
+    fi
+    local pids=($(lsof -ti :$1))
+    if [ ${#pids[@]} -eq 0 ]; then
+        echo "No process running on port $1"
+    else
+        echo "Killing processes [${pids[@]}] running on port $1..."
+        kill -9 "${pids[@]}"
+        echo "Done!"
+    fi
+}
