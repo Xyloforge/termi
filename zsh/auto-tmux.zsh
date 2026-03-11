@@ -2,8 +2,8 @@
 # Auto-Tmux Configuration (Added by Install Script)
 # -----------------------------------------------------------------------------
 
-# Ensure Homebrew bin is in path (common issue on M1/M2/M3 Macs)
-export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+# Ensure Homebrew bin is in path (common issue on M1/M2/M3 Macs, and Linuxbrew)
+export PATH="/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:$PATH"
 
 # Only run if:
 # 1. Not already in Tmux

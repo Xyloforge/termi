@@ -27,8 +27,9 @@
     "editor.lineHeight": 1.6,
     "editor.cursorBlinking": "smooth",
     "editor.cursorSmoothCaretAnimation": "on",
-    "editor.minimap.enabled": false,
-    "editor.scrollbar.vertical": "hidden",
+    "editor.minimap.enabled": true,
+    "editor.minimap.side": "left",
+    "editor.scrollbar.vertical": "visible",
     "editor.renderLineHighlight": "none",
     "editor.overviewRulerBorder": false,
     "editor.hideCursorInOverviewRuler": true,
@@ -52,7 +53,9 @@
     "workbench.sideBar.location": "left",
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
-    "breadcrumbs.enabled": false,
+    "breadcrumbs.enabled": true,
+    "workbench.editor.labelFormat": "medium",
+    "window.title": "${activeEditorMedium}${separator}${rootName}",
     "workbench.statusBar.visible": false,
     // ═══════════════════════════════════════════════════════════════
     //  CATPPUCCIN MOCHA PALETTE REFERENCE

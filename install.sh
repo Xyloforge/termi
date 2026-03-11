@@ -44,11 +44,20 @@ if [ "$OS" = "Darwin" ]; then
     brew_cask_install alacritty
     brew_cask_install font-jetbrains-mono-nerd-font
     
+    # Add taps
+    brew tap kopecmaciej/vi-mongo
+    brew tap honhimW/tap
+
     # Install Tmux & Tools
     brew_install tmux
     brew_install fzf
     brew_install bat
     brew_install btop
+    brew_install zoxide
+    brew_install lazysql
+    brew_install vi-mongo
+    brew_install ratisui
+    brew_install oxker
 
     # Fix "App can't be opened" error for Alacritty (Code Signing / Quarantine)
     if [ -d "/Applications/Alacritty.app" ]; then
@@ -64,8 +73,59 @@ elif [ "$OS" = "Linux" ]; then
     # Simple check for apt
     if command -v apt-get &> /dev/null; then
         sudo apt-get update
-        sudo apt-get install -y alacritty tmux fzf bat
-        echo "⚠️  Please ensure JetBrainsMono Nerd Font is installed manually on Linux."
+        sudo apt-get install -y tmux fzf bat btop zoxide wget unzip fontconfig lsof
+        # Alacritty may not be in all apt repos — install if available, skip otherwise
+        sudo apt-get install -y alacritty 2>/dev/null || echo "⚠️  Alacritty not found in apt. Install manually or via snap: 'sudo snap install alacritty --classic'"
+        
+        echo "📦 Handling JetBrainsMono Nerd Font..."
+        FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+        if [ ! -d "$FONT_DIR" ]; then
+            echo "   - Downloading and extracting JetBrainsMono Nerd Font..."
+            mkdir -p "$FONT_DIR"
+            TEMP_DIR=$(mktemp -d)
+            if wget -qO "$TEMP_DIR/JetBrainsMono.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"; then
+                unzip -qo "$TEMP_DIR/JetBrainsMono.zip" -d "$FONT_DIR"
+                fc-cache -fv &> /dev/null
+                echo "   ✅ JetBrainsMono Nerd Font installed."
+            else
+                echo "   ⚠️ Failed to download JetBrainsMono Nerd Font. Please install manually."
+            fi
+            rm -rf "$TEMP_DIR"
+        else
+            echo "   - JetBrainsMono Nerd Font directory already exists."
+        fi
+
+        echo "🐳 Installing Oxker (Docker TUI)..."
+        if ! command -v oxker &> /dev/null; then
+            echo "   - Downloading and installing Oxker..."
+            ARCH=$(uname -m)
+            if [ "$ARCH" = "x86_64" ]; then
+                OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_x86_64.tar.gz"
+            elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+                OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_aarch64.tar.gz"
+            else
+                OXKER_URL=""
+            fi
+            
+            if [ -n "$OXKER_URL" ]; then
+                TEMP_DIR=$(mktemp -d)
+                if wget -qO "$TEMP_DIR/oxker.tar.gz" "$OXKER_URL"; then
+                    tar -xzf "$TEMP_DIR/oxker.tar.gz" -C "$TEMP_DIR"
+                    sudo mv "$TEMP_DIR/oxker" /usr/local/bin/
+                    sudo chmod +x /usr/local/bin/oxker
+                    echo "   ✅ Oxker installed."
+                else
+                    echo "   ⚠️ Failed to download Oxker."
+                fi
+                rm -rf "$TEMP_DIR"
+            else
+                echo "   ⚠️ Unsupported architecture for Oxker auto-install."
+            fi
+        else
+            echo "   - Oxker is already installed."
+        fi
+
+        echo "⚠️  lazysql, vi-mongo, and ratisui are not in standard apt repos. Recommend installing Homebrew on Linux to get them."
     else
         echo "⚠️  Unsupported package manager. Please install 'alacritty' and 'tmux' manually."
     fi
@@ -97,13 +157,29 @@ echo "🔗 Linking custom configurations..."
 
 # Alacritty
 mkdir -p "$CONFIG_DIR/alacritty"
-# Link alacritty.toml
-ln -sf "$REPO_DIR/config/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
-# Link theme file
+# Backup existing Alacritty config if not a symlink
+if [ -f "$CONFIG_DIR/alacritty/alacritty.toml" ] && [ ! -L "$CONFIG_DIR/alacritty/alacritty.toml" ]; then
+    echo "   - Backing up existing alacritty.toml to alacritty.toml.bak"
+    mv "$CONFIG_DIR/alacritty/alacritty.toml" "$CONFIG_DIR/alacritty/alacritty.toml.bak"
+fi
+# Link alacritty.toml (Using OS-specific config as main entry point)
+if [ "$OS" = "Darwin" ]; then
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+else
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
+fi
+
+# Link imported common configs
+ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
 ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
 
 # Tmux
 mkdir -p "$CONFIG_DIR/tmux"
+# Backup existing Tmux config if not a symlink
+if [ -f "$CONFIG_DIR/tmux/tmux.conf" ] && [ ! -L "$CONFIG_DIR/tmux/tmux.conf" ]; then
+    echo "   - Backing up existing tmux.conf to tmux.conf.bak"
+    mv "$CONFIG_DIR/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf.bak"
+fi
 # Link tmux.conf
 ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
 
@@ -126,6 +202,14 @@ AUTO_TMUX_SNIPPET="$REPO_DIR/zsh/auto-tmux.zsh"
 FEATURES_SNIPPET="$REPO_DIR/zsh/features.zsh"
 
 echo "🐚 Configure Zsh..."
+
+# Safely ensure .zshrc exists
+if [ ! -f "$ZSHRC" ]; then
+    touch "$ZSHRC"
+fi
+
+# Backup existing .zshrc safely
+cp "$ZSHRC" "${ZSHRC}.bak"
 
 # 4.1 Auto-Tmux
 if grep -q "Auto-Tmux Configuration" "$ZSHRC"; then
