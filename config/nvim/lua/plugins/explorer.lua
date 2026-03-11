@@ -24,6 +24,7 @@ return {
             map("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>",   { desc = "Toggle file tree" })
             map("n", "<leader>ef", "<cmd>NvimTreeFindFile<CR>", { desc = "Find file in tree" })
             map("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse tree" })
+            map("n", "<leader>eo", "<cmd>NvimTreeFocus<CR>",    { desc = "Focus file tree" })
         end,
     },
 }

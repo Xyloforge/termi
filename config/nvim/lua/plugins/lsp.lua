@@ -14,7 +14,7 @@ return {
             "hrsh7th/cmp-nvim-lsp",
         },
         opts = {
-            ensure_installed = { "lua_ls", "ts_ls", "pyright", "rust_analyzer", "bashls" },
+            ensure_installed = { "lua_ls", "ts_ls", "pyright", "rust_analyzer", "bashls", "gopls" },
             automatic_installation = true,
         },
         config = function(_, opts)

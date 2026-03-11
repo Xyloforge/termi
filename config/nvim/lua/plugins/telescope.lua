@@ -20,6 +20,7 @@ return {
                     layout_config = { prompt_position = "top" },
                     sorting_strategy = "ascending",
                     file_ignore_patterns = { "node_modules", ".git/", "dist/" },
+                    preview = { treesitter = false },
                 },
             })
 
