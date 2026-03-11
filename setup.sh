@@ -76,15 +76,21 @@ install_core() {
         }
 
         log_info "Installing packages..."
-        # Install Alacritty, Fonts, FZF, Bat
         brew_cask_install alacritty
         brew_cask_install font-jetbrains-mono-nerd-font
-        
-        # Install Tmux & Tools
+
+        # Taps for extra tools
+        brew tap kopecmaciej/vi-mongo 2>/dev/null || true
+        brew tap honhimW/tap 2>/dev/null || true
+
         brew_install tmux
         brew_install fzf
         brew_install bat
         brew_install btop
+        brew_install zoxide
+        brew_install lazysql
+        brew_install vi-mongo
+        brew_install ratisui
         brew_install oxker
 
         if [ "$INSTALL_NEOVIM" = true ]; then

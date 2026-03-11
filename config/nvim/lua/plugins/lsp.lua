@@ -18,12 +18,9 @@ return {
             automatic_installation = true,
         },
         config = function(_, opts)
-            require("mason-lspconfig").setup(opts)
-
             local lspconfig = require("lspconfig")
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-            -- On-attach: set LSP keymaps per buffer
             local on_attach = function(_, bufnr)
                 local map = function(keys, func, desc)
                     vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
@@ -38,24 +35,27 @@ return {
                 map("<leader>f",  function() vim.lsp.buf.format({ async = true }) end, "Format file")
             end
 
-            -- Default handler for all servers
-            require("mason-lspconfig").setup_handlers({
-                function(server)
-                    lspconfig[server].setup({
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                    })
-                end,
-                -- Lua: suppress vim global warning
-                ["lua_ls"] = function()
-                    lspconfig.lua_ls.setup({
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                        settings = {
-                            Lua = { diagnostics = { globals = { "vim" } } },
-                        },
-                    })
-                end,
+            -- handlers inside setup() — required for mason-lspconfig v2+
+            require("mason-lspconfig").setup({
+                ensure_installed = opts.ensure_installed,
+                automatic_installation = opts.automatic_installation,
+                handlers = {
+                    function(server)
+                        lspconfig[server].setup({
+                            capabilities = capabilities,
+                            on_attach = on_attach,
+                        })
+                    end,
+                    ["lua_ls"] = function()
+                        lspconfig.lua_ls.setup({
+                            capabilities = capabilities,
+                            on_attach = on_attach,
+                            settings = {
+                                Lua = { diagnostics = { globals = { "vim" } } },
+                            },
+                        })
+                    end,
+                },
             })
         end,
     },
