@@ -17,6 +17,7 @@ bindings = [
     # Tmux navigation
     { key = "P",     mods = "Command",              chars = "\u0000w" },
     { key = "P",     mods = "Command|Shift",         chars = "\u0000s" },
+    { key = "I",     mods = "Command",              chars = "\u0000f" },
     { key = "O",     mods = "Command",              chars = "\u0000q" },
 
     # Resize panes
