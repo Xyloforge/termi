@@ -289,6 +289,9 @@ install_core() {
     mkdir -p "$CONFIG_DIR/tmux"
     ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
     ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
     
     # Btop
     mkdir -p "$CONFIG_DIR/btop/themes"
@@ -432,6 +435,9 @@ update_core() {
     fi
     ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
     ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
     ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 

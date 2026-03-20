@@ -43,9 +43,35 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | **Reload Config**   | `Ctrl+Space` then `r`                              |
 | **Install Plugins** | `Ctrl+Space` then `I` (Capital i)                  |
 
-## 📝 Copy / Paste
+## 📝 Copy / Paste / Log Grabber
 
-| Action        | Shortcut              |
-| :------------ | :-------------------- |
-| **Copy Mode** | `Ctrl+Space` then `[` |
-| **Paste**     | `Cmd + V`             |
+| Action                  | MacOS Shortcut (Alacritty)  | Tmux Shortcut                           |
+| :---------------------- | :-------------------------- | :-------------------------------------- |
+| **Enter Copy Mode**     | `Cmd + F`                   | `Ctrl+Space` then `v`                   |
+| **Start Selection**     | _(in copy mode)_ `v`        | _(in copy mode)_ `v`                    |
+| **Select Line**         | _(in copy mode)_ `V`        | _(in copy mode)_ `V`                    |
+| **Block Select**        | _(in copy mode)_ `Ctrl+V`   | _(in copy mode)_ `Ctrl+V`              |
+| **Yank (Copy)**         | _(in copy mode)_ `y`        | _(in copy mode)_ `y`                    |
+| **Cancel Selection**    | _(in copy mode)_ `Escape`   | _(in copy mode)_ `Escape`              |
+| **Search Forward**      | _(in copy mode)_ `/`        | _(in copy mode)_ `/`                    |
+| **Search Backward**     | _(in copy mode)_ `?`        | _(in copy mode)_ `?`                    |
+| **Log Grabber (fzf)**   | `Cmd + G`                   | `Ctrl+Space` then `g`                   |
+| **Copy (native)**       | `Cmd + C`                   | _(mouse select)_                        |
+| **Paste**               | `Cmd + V`                   | `Cmd + V`                               |
+
+### 🔍 Log Grabber Workflow
+
+1. Press `Cmd + G` (or `Prefix + g`) to open the log grabber popup
+2. **Preview pane** shows ±5 lines of context around the highlighted line
+3. Type to fuzzy-search through your terminal scrollback
+4. Press `Tab` to select multiple lines
+5. Press `Enter` — selected lines are copied to your clipboard
+6. A **preview popup** confirms what you grabbed — press any key to dismiss
+
+| Filter Keybind | Effect                                    |
+| :------------- | :---------------------------------------- |
+| `Ctrl + E`     | Show only ERROR / WARN / FATAL / PANIC    |
+| `Ctrl + D`     | Show only debug / log / trace lines       |
+| `Ctrl + A`     | Reset — show all lines                    |
+
+> **Tip**: You can also run `~/.config/tmux/log_grabber.sh debug.log` directly to search a log file.

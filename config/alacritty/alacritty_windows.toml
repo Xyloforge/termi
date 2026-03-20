@@ -40,6 +40,10 @@ bindings = [
     # Window management
     { key = "N",     mods = "Alt",              action = "ToggleFullscreen" },
 
+    # Copy-mode & Log Grabber
+    { key = "F",     mods = "Alt",              chars = "\u0000v" },
+    { key = "G",     mods = "Alt",              chars = "\u0000g" },
+
     # Clipboard (Ctrl+Shift+C/V is standard on Linux/Windows terminals)
     { key = "C",     mods = "Control|Shift",     action = "Copy" },
     { key = "V",     mods = "Control|Shift",     action = "Paste" },
