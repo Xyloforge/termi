@@ -8,17 +8,17 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 
 | Action | MacOS Shortcut (Alacritty) | Tmux Shortcut |
 | :--- | :--- | :--- |
-| **New Window** | `Cmd + Y` | `Ctrl+Space` then `c` |
-| **Split Right** | `Cmd + D` | `Ctrl+Space` then `%` |
-| **Split Down** | `Cmd + Shift + D` | `Ctrl+Space` then `"` |
-| **Close Pane** | `Cmd + W` | `Ctrl+Space` then `x` |
-| **Close Window** | `Cmd + Shift + W` | `Ctrl+Space` then `&` |
+| **New Window** | `Cmd + Y` | `Ctrl+Space` then `y` |
+| **Split Right** | `Cmd + D` | `Ctrl+Space` then `d` |
+| **Split Down** | `Cmd + Shift + D` | `Ctrl+Space` then `D` |
+| **Close Pane** | `Cmd + W` | `Ctrl+Space` then `w` |
+| **Close Window** | `Cmd + Shift + W` | `Ctrl+Space` then `W` |
 | **Next Window** | *(none)* | `Ctrl+Space` then `n` |
-| **Previous Window** | *(none)* | `Ctrl+Space` then `p` |
-| **List Windows/Panes** | `Cmd + P` | `Ctrl+Space` then `w` |
-| **List Sessions** | `Cmd + Shift + P` | `Ctrl+Space` then `s` |
-| **Show Pane Numbers** | `Cmd + O` | `Ctrl+Space` then `q` |
-| **Rename Window** | `Cmd + Shift + R` | `Ctrl+Space` then `,` |
+| **Previous Window** | *(none)* | `Ctrl+Space` then `N` |
+| **List Windows/Panes** | `Cmd + P` | `Ctrl+Space` then `p` |
+| **List Sessions** | `Cmd + Shift + P` | `Ctrl+Space` then `P` |
+| **Show Pane Numbers** | `Cmd + O` | `Ctrl+Space` then `o` |
+| **Rename Window** | `Cmd + Shift + R` | `Ctrl+Space` then `R` |
 
 ## 🧭 Navigation
 

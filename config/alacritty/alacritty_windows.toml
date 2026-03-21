@@ -11,18 +11,18 @@ bindings = [
     # Using Alt as the primary modifier.
 
     # Tmux splits (Prefix = Ctrl+Space = \x00)
-    { key = "D",     mods = "Alt",              chars = "\u0000%" },
-    { key = "D",     mods = "Alt|Shift",         chars = "\u0000\"" },
+    { key = "D",     mods = "Alt",              chars = "\u0000d" },
+    { key = "D",     mods = "Alt|Shift",         chars = "\u0000D" },
 
     # Pane/Window management
-    { key = "W",     mods = "Alt",              chars = "\u0000x" },
-    { key = "W",     mods = "Alt|Shift",         chars = "\u0000&" },
-    { key = "Y",     mods = "Alt",              chars = "\u0000c" },
+    { key = "W",     mods = "Alt",              chars = "\u0000w" },
+    { key = "W",     mods = "Alt|Shift",         chars = "\u0000W" },
+    { key = "Y",     mods = "Alt",              chars = "\u0000y" },
 
     # Tmux navigation
-    { key = "P",     mods = "Alt",              chars = "\u0000w" },
-    { key = "P",     mods = "Alt|Shift",         chars = "\u0000s" },
-    { key = "O",     mods = "Alt",              chars = "\u0000q" },
+    { key = "P",     mods = "Alt",              chars = "\u0000p" },
+    { key = "P",     mods = "Alt|Shift",         chars = "\u0000P" },
+    { key = "O",     mods = "Alt",              chars = "\u0000o" },
 
     # Resize panes
     { key = "H",     mods = "Alt",              chars = "\u0000H" },
@@ -31,7 +31,7 @@ bindings = [
     { key = "L",     mods = "Alt",              chars = "\u0000L" },
 
     # Rename window
-    { key = "R",     mods = "Alt|Shift",         chars = "\u0000," },
+    { key = "R",     mods = "Alt|Shift",         chars = "\u0000R" },
 
     # Line navigation
     { key = "Left",  mods = "Alt",              chars = "\u0001" },
