@@ -10,17 +10,17 @@ if (-not $isAdmin) {
     exit 1
 }
 
-# 1. Install Alpine WSL
-Write-Host "🐧 checking for WSL (Alpine)..." -ForegroundColor Green
-if (-not (wsl -l -v | Select-String "Alpine")) {
-    Write-Host "   - Installing Alpine Linux..."
-    wsl --install -d Alpine
+# 1. Install Ubuntu WSL
+Write-Host "🐧 checking for WSL (Ubuntu)..." -ForegroundColor Green
+if (-not (wsl -l -v | Select-String "Ubuntu")) {
+    Write-Host "   - Installing Ubuntu..."
+    wsl --install -d Ubuntu
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Failed to install WSL. You might need to enable 'Virtual Machine Platform' feature and reboot first." -ForegroundColor Red
         exit 1
     }
 } else {
-    Write-Host "   - Alpine already installed."
+    Write-Host "   - Ubuntu already installed."
 }
 
 # 2. Install Alacritty (Windows)
@@ -79,15 +79,15 @@ Create-Link "$repoDir\config\alacritty\alacritty_windows.toml" "$alacrittyConfig
 Create-Link "$repoDir\config\alacritty\alacritty_common.toml" "$alacrittyConfigDir\alacritty_common.toml"
 Create-Link "$repoDir\config\alacritty\catppuccin-mocha.toml" "$alacrittyConfigDir\catppuccin-mocha.toml"
 
-# 5. Bootstrap Alpine Environment
-Write-Host "🔧 Bootstrapping Alpine Environment..." -ForegroundColor Green
+# 5. Bootstrap Ubuntu Environment
+Write-Host "🔧 Bootstrapping Ubuntu Environment..." -ForegroundColor Green
 # We need to map the current windows path to WSL path /mnt/c/...
 # Remove "C:" and replace "\" with "/"
 $currentPath = $repoDir -replace "C:", "/mnt/c" -replace "\\", "/"
 $wslSetupCommand = "cd '$currentPath' && chmod +x setup.sh && ./setup.sh install"
 
-Write-Host "   - Running setup.sh inside Alpine..."
-wsl -d Alpine -e sh -c $wslSetupCommand
+Write-Host "   - Running setup.sh inside Ubuntu..."
+wsl -d Ubuntu -e sh -c $wslSetupCommand
 
 Write-Host ""
 Write-Host "🎉 Setup Complete!" -ForegroundColor Cyan
