@@ -15,8 +15,12 @@ Runs the universal setup script. Detects OS, installs dependencies (brew/apt/apk
 
 2.  **Restart**: Close your current terminal and open **Alacritty**.
 
-### 🪟 Windows (Native-Feel)
-Automated setup that installs **WSL (Alpine Linux)**, **Alacritty**, and **Nerd Fonts** for you. No manual work required.
+### 🪟 Windows
+
+We provide two installation options on Windows depending on your workflow:
+
+#### Option 1: Native PowerShell (Pure Windows)
+Installs Alacritty, FZF, Zoxide, Bat, and Oh My Posh configured dynamically with Catppuccin Mocha to run perfectly in pure Windows PowerShell.
 
 1.  Open **PowerShell as Administrator**.
 2.  Clone the repo:
@@ -24,7 +28,30 @@ Automated setup that installs **WSL (Alpine Linux)**, **Alacritty**, and **Nerd 
     git clone git@github.com:Xyloforge/termi.git $HOME\termi
     cd $HOME\termi
     ```
-3.  Run the installer:
+3.  Set the execution policy so scripts can run:
+    ```powershell
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  Run the native installer:
+    ```powershell
+    .\setup.ps1 -install
+    ```
+4.  **Done**: Initial setup happens automatically. Open **Alacritty** from your Start Menu.
+
+#### Option 2: Lightweight WSL (Alpine Linux)
+Automated setup that seamlessly installs **WSL (Alpine Linux)** inside, but behaves like a native window running TMUX + Zsh + Linux tools.
+
+1.  Open **PowerShell as Administrator**.
+2.  Clone the repo:
+    ```powershell
+    git clone git@github.com:Xyloforge/termi.git $HOME\termi
+    cd $HOME\termi
+    ```
+3.  Set the execution policy so scripts can run:
+    ```powershell
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+4.  Run the WSL installer:
     ```powershell
     .\install_windows.ps1
     ```
