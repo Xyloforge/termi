@@ -3,7 +3,7 @@ import = ["~/.config/alacritty/alacritty_common.toml"]
 
 [shell]
 program = "wsl.exe"
-args = ["-d", "Alpine"]
+args = ["-d", "Ubuntu"]
 
 [keyboard]
 bindings = [
