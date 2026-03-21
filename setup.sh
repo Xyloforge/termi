@@ -35,6 +35,18 @@ log_error() {
 install_core() {
     log_info "Starting Termi setup..."
 
+    # Optional: Neovim
+    INSTALL_NEOVIM=false
+    if command -v nvim &> /dev/null; then
+        log_info "Neovim already installed — skipping prompt."
+        INSTALL_NEOVIM=true
+    else
+        read -r -p "Install Neovim? [y/N] " _nvim_reply
+        if [[ "$_nvim_reply" =~ ^[Yy]$ ]]; then
+            INSTALL_NEOVIM=true
+        fi
+    fi
+
     # 1. OS Detection & Dependency Installation
     OS="$(uname -s)"
     if [ "$OS" = "Darwin" ]; then
@@ -64,15 +76,26 @@ install_core() {
         }
 
         log_info "Installing packages..."
-        # Install Alacritty, Fonts, FZF, Bat
         brew_cask_install alacritty
         brew_cask_install font-jetbrains-mono-nerd-font
-        
-        # Install Tmux & Tools
+
+        # Taps for extra tools
+        brew tap kopecmaciej/vi-mongo 2>/dev/null || true
+        brew tap honhimW/tap 2>/dev/null || true
+
         brew_install tmux
         brew_install fzf
         brew_install bat
         brew_install btop
+        brew_install zoxide
+        brew_install lazysql
+        brew_install vi-mongo
+        brew_install ratisui
+        brew_install oxker
+
+        if [ "$INSTALL_NEOVIM" = true ]; then
+            brew_install neovim
+        fi
 
         # Fix "App can't be opened" error for Alacritty
         if [ -d "/Applications/Alacritty.app" ]; then
@@ -94,10 +117,61 @@ install_core() {
             
             sudo apk update
             # Core tools
-            sudo apk add tmux zsh git fzf bat
+            sudo apk add tmux zsh git fzf bat btop zoxide wget tar unzip lsof fontconfig
+            if [ "$INSTALL_NEOVIM" = true ]; then
+                sudo apk add neovim
+            fi
             # Optional: Alacritty (only if you plan to run GUI from WSL, mostly unused for headless)
             # sudo apk add alacritty || true 
+
+            log_info "Installing Oxker (Docker TUI)..."
+            if ! command -v oxker &> /dev/null; then
+                ARCH=$(uname -m)
+                if [ "$ARCH" = "x86_64" ]; then
+                    OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_x86_64.tar.gz"
+                elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+                    OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_aarch64.tar.gz"
+                else
+                    OXKER_URL=""
+                fi
+                
+                if [ -n "$OXKER_URL" ]; then
+                    TEMP_DIR=$(mktemp -d)
+                    if wget -qO "$TEMP_DIR/oxker.tar.gz" "$OXKER_URL"; then
+                        tar -xzf "$TEMP_DIR/oxker.tar.gz" -C "$TEMP_DIR"
+                        sudo mv "$TEMP_DIR/oxker" /usr/local/bin/
+                        sudo chmod +x /usr/local/bin/oxker
+                        log_success "Oxker installed."
+                    else
+                        log_warn "Failed to download Oxker."
+                    fi
+                    rm -rf "$TEMP_DIR"
+                else
+                    log_warn "Unsupported architecture for Oxker auto-install."
+                fi
+            else
+                log_info "Oxker is already installed."
+            fi
             
+            log_info "Installing JetBrainsMono Nerd Font..."
+            FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+            if [ ! -d "$FONT_DIR" ]; then
+                mkdir -p "$FONT_DIR"
+                TEMP_DIR=$(mktemp -d)
+                if wget -qO "$TEMP_DIR/JetBrainsMono.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"; then
+                    unzip -qo "$TEMP_DIR/JetBrainsMono.zip" -d "$FONT_DIR"
+                    fc-cache -fv &> /dev/null
+                    log_success "JetBrainsMono Nerd Font installed."
+                else
+                    log_warn "Failed to download JetBrainsMono Nerd Font. Please install manually."
+                fi
+                rm -rf "$TEMP_DIR"
+            else
+                log_info "JetBrainsMono Nerd Font already installed."
+            fi
+
+            log_warn "lazysql, vi-mongo, and ratisui are not in Alpine repos. Install Homebrew on Linux to get them: https://brew.sh"
+
             # Change default shell to zsh if not already
             if [[ "$SHELL" != *"/zsh" ]]; then
                  log_info "Changing default shell to zsh..."
@@ -107,14 +181,65 @@ install_core() {
         # Check for apt-get (Debian/Ubuntu/WSL)
         elif command -v apt-get &> /dev/null; then
             sudo apt-get update
-            sudo apt-get install -y alacritty tmux fzf bat
-            
-            # WSL 2 Check: Fonts often need to be installed in Windows, not just Linux subsys
-            if grep -q "microsoft" /proc/version 2>/dev/null; then
-                 log_warn "WSL detected: You must install 'JetBrainsMono Nerd Font' on Windows manually!"
-            else
-                 log_warn "Please ensure 'JetBrainsMono Nerd Font' is installed manually on your system."
+            sudo apt-get install -y tmux fzf bat btop zoxide wget tar unzip fontconfig lsof
+            if [ "$INSTALL_NEOVIM" = true ]; then
+                sudo apt-get install -y neovim
             fi
+            # Alacritty may not be in all apt repos — install if available, skip otherwise
+            sudo apt-get install -y alacritty 2>/dev/null || log_warn "Alacritty not found in apt. Install manually or via snap: 'sudo snap install alacritty --classic'"
+
+            log_info "Installing JetBrainsMono Nerd Font..."
+            FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+            if [ ! -d "$FONT_DIR" ]; then
+                mkdir -p "$FONT_DIR"
+                TEMP_DIR=$(mktemp -d)
+                if wget -qO "$TEMP_DIR/JetBrainsMono.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"; then
+                    unzip -qo "$TEMP_DIR/JetBrainsMono.zip" -d "$FONT_DIR"
+                    fc-cache -fv &> /dev/null
+                    log_success "JetBrainsMono Nerd Font installed."
+                else
+                    log_warn "Failed to download JetBrainsMono Nerd Font. Please install manually."
+                fi
+                rm -rf "$TEMP_DIR"
+            else
+                log_info "JetBrainsMono Nerd Font already installed."
+            fi
+
+            log_info "Installing Oxker (Docker TUI)..."
+            if ! command -v oxker &> /dev/null; then
+                ARCH=$(uname -m)
+                if [ "$ARCH" = "x86_64" ]; then
+                    OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_x86_64.tar.gz"
+                elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+                    OXKER_URL="https://github.com/mrjackwills/oxker/releases/latest/download/oxker_linux_aarch64.tar.gz"
+                else
+                    OXKER_URL=""
+                fi
+                
+                if [ -n "$OXKER_URL" ]; then
+                    TEMP_DIR=$(mktemp -d)
+                    if wget -qO "$TEMP_DIR/oxker.tar.gz" "$OXKER_URL"; then
+                        tar -xzf "$TEMP_DIR/oxker.tar.gz" -C "$TEMP_DIR"
+                        sudo mv "$TEMP_DIR/oxker" /usr/local/bin/
+                        sudo chmod +x /usr/local/bin/oxker
+                        log_success "Oxker installed."
+                    else
+                        log_warn "Failed to download Oxker."
+                    fi
+                    rm -rf "$TEMP_DIR"
+                else
+                    log_warn "Unsupported architecture for Oxker auto-install."
+                fi
+            else
+                log_info "Oxker is already installed."
+            fi
+            
+            # WSL 2: fonts need to be installed in Windows, not the Linux subsystem
+            if grep -q "microsoft" /proc/version 2>/dev/null; then
+                log_warn "WSL detected: Install 'JetBrainsMono Nerd Font' on Windows for Alacritty font rendering."
+            fi
+
+            log_warn "lazysql, vi-mongo, and ratisui are not in standard apt repos. Install Homebrew on Linux to get them: https://brew.sh"
         else
             log_warn "Unsupported package manager (not apt). Please install 'alacritty', 'tmux', 'fzf', 'bat' manually."
         fi
@@ -163,11 +288,26 @@ install_core() {
     # Tmux
     mkdir -p "$CONFIG_DIR/tmux"
     ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
     
     # Btop
     mkdir -p "$CONFIG_DIR/btop/themes"
     ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
+
+    # Neovim
+    if [ "$INSTALL_NEOVIM" = true ]; then
+        log_info "Linking Neovim config..."
+        if [ -d "$CONFIG_DIR/nvim" ] && [ ! -L "$CONFIG_DIR/nvim" ]; then
+            log_info "Backing up existing nvim config to nvim.bak..."
+            mv "$CONFIG_DIR/nvim" "$CONFIG_DIR/nvim.bak"
+        fi
+        ln -sfn "$REPO_DIR/config/nvim" "$CONFIG_DIR/nvim"
+        log_success "Neovim config linked. Plugins will auto-install on first launch."
+    fi
 
     # 4. Tmux Plugin Manager
     if [ ! -d "$TMUX_PLUGIN_DIR" ]; then
@@ -294,6 +434,10 @@ update_core() {
         ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
     fi
     ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
     ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 

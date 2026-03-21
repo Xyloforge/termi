@@ -53,7 +53,9 @@
     "workbench.sideBar.location": "left",
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
-    "breadcrumbs.enabled": false,
+    "breadcrumbs.enabled": true,
+    "workbench.editor.labelFormat": "medium",
+    "window.title": "${activeEditorMedium}${separator}${rootName}",
     "workbench.statusBar.visible": false,
     // ═══════════════════════════════════════════════════════════════
     //  CATPPUCCIN MOCHA PALETTE REFERENCE

@@ -88,9 +88,24 @@ fi
 # 6. Clipboard Integration (ccat: cat + copy)
 alias ccat='_ccat_func'
 _ccat_func() {
-  cat "$@" | pbcopy
+  if command -v pbcopy &> /dev/null; then
+    cat "$@" | pbcopy
+  elif command -v xclip &> /dev/null; then
+    cat "$@" | xclip -selection clipboard
+  elif command -v wl-copy &> /dev/null; then
+    cat "$@" | wl-copy
+  else
+    echo "❌ No clipboard manager found (pbcopy, xclip, wl-copy)"
+    return 1
+  fi
   echo '✅ Copied to clipboard!'
 }
+
+# 6.5. OS Agnostic Open Command
+if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v xdg-open &> /dev/null; then
+  alias open='xdg-open'
+fi
+
 # 7. Zoxide (Smarter cd)
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init zsh)"
@@ -109,6 +124,12 @@ fi
 
 if command -v ratisui &> /dev/null; then
     alias rtui='ratisui'
+fi
+
+# 8.5 Docker Management TUI
+if command -v oxker &> /dev/null; then
+    alias ox='oxker'
+    alias docker-tui='oxker'
 fi
 
 # 9. Port / Process Search

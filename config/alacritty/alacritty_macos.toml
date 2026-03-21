@@ -6,18 +6,19 @@ import = [
 [keyboard]
 bindings = [
     # Tmux splits (Prefix = Ctrl+Space = \x00)
-    { key = "D",     mods = "Command",              chars = "\u0000d" },
-    { key = "D",     mods = "Command|Shift",         chars = "\u0000D" },
+    { key = "D",     mods = "Command",              chars = "\u0000%" },
+    { key = "D",     mods = "Command|Shift",         chars = "\u0000\"" },
 
     # Pane/Window management
-    { key = "W",     mods = "Command",              chars = "\u0000w" },
-    { key = "W",     mods = "Command|Shift",         chars = "\u0000W" },
-    { key = "Y",     mods = "Command",              chars = "\u0000y" },
+    { key = "W",     mods = "Command",              chars = "\u0000x" },
+    { key = "W",     mods = "Command|Shift",         chars = "\u0000&" },
+    { key = "Y",     mods = "Command",              chars = "\u0000c" },
 
     # Tmux navigation
-    { key = "P",     mods = "Command",              chars = "\u0000p" },
-    { key = "P",     mods = "Command|Shift",         chars = "\u0000P" },
-    { key = "O",     mods = "Command",              chars = "\u0000o" },
+    { key = "P",     mods = "Command",              chars = "\u0000w" },
+    { key = "P",     mods = "Command|Shift",         chars = "\u0000s" },
+    { key = "I",     mods = "Command",              chars = "\u0000f" },
+    { key = "O",     mods = "Command",              chars = "\u0000q" },
 
     # Resize panes
     { key = "H",     mods = "Command",              chars = "\u0000H" },
@@ -26,7 +27,7 @@ bindings = [
     { key = "L",     mods = "Command",              chars = "\u0000L" },
 
     # Rename window
-    { key = "R",     mods = "Command|Shift",         chars = "\u0000R" },
+    { key = "R",     mods = "Command|Shift",         chars = "\u0000," },
 
     # Line navigation
     { key = "Left",  mods = "Command",              chars = "\u0001" },
@@ -34,6 +35,10 @@ bindings = [
 
     # Window management
     { key = "N",     mods = "Command",              action = "ToggleFullscreen" },
+
+    # Copy-mode & Log Grabber
+    { key = "F",     mods = "Command",              chars = "\u0000v" },
+    { key = "G",     mods = "Command",              chars = "\u0000g" },
 
     # Clipboard
     { key = "C",     mods = "Command",              action = "Copy" },

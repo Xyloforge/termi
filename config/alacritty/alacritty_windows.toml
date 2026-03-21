@@ -11,18 +11,18 @@ bindings = [
     # Using Alt as the primary modifier.
 
     # Tmux splits (Prefix = Ctrl+Space = \x00)
-    { key = "D",     mods = "Alt",              chars = "\u0000d" },
-    { key = "D",     mods = "Alt|Shift",         chars = "\u0000D" },
+    { key = "D",     mods = "Alt",              chars = "\u0000%" },
+    { key = "D",     mods = "Alt|Shift",         chars = "\u0000\"" },
 
     # Pane/Window management
-    { key = "W",     mods = "Alt",              chars = "\u0000w" },
-    { key = "W",     mods = "Alt|Shift",         chars = "\u0000W" },
-    { key = "Y",     mods = "Alt",              chars = "\u0000y" },
+    { key = "W",     mods = "Alt",              chars = "\u0000x" },
+    { key = "W",     mods = "Alt|Shift",         chars = "\u0000&" },
+    { key = "Y",     mods = "Alt",              chars = "\u0000c" },
 
     # Tmux navigation
-    { key = "P",     mods = "Alt",              chars = "\u0000p" },
-    { key = "P",     mods = "Alt|Shift",         chars = "\u0000P" },
-    { key = "O",     mods = "Alt",              chars = "\u0000o" },
+    { key = "P",     mods = "Alt",              chars = "\u0000w" },
+    { key = "P",     mods = "Alt|Shift",         chars = "\u0000s" },
+    { key = "O",     mods = "Alt",              chars = "\u0000q" },
 
     # Resize panes
     { key = "H",     mods = "Alt",              chars = "\u0000H" },
@@ -31,7 +31,7 @@ bindings = [
     { key = "L",     mods = "Alt",              chars = "\u0000L" },
 
     # Rename window
-    { key = "R",     mods = "Alt|Shift",         chars = "\u0000R" },
+    { key = "R",     mods = "Alt|Shift",         chars = "\u0000," },
 
     # Line navigation
     { key = "Left",  mods = "Alt",              chars = "\u0001" },
@@ -39,6 +39,10 @@ bindings = [
 
     # Window management
     { key = "N",     mods = "Alt",              action = "ToggleFullscreen" },
+
+    # Copy-mode & Log Grabber
+    { key = "F",     mods = "Alt",              chars = "\u0000v" },
+    { key = "G",     mods = "Alt",              chars = "\u0000g" },
 
     # Clipboard (Ctrl+Shift+C/V is standard on Linux/Windows terminals)
     { key = "C",     mods = "Control|Shift",     action = "Copy" },

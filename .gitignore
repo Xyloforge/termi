@@ -1,0 +1,9 @@
+# Claude Code local settings
+.claude/
+
+# Scratch / test files
+config/tmux/test.conf
+*.bak
+
+# macOS
+.DS_Store
