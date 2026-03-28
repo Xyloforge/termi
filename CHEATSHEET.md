@@ -19,6 +19,7 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | **List Windows/Panes** | `Cmd + P`                  | `Ctrl+Space` then `w` |
 | **List Sessions**      | `Cmd + Shift + P`          | `Ctrl+Space` then `s` |
 | **Show Pane Numbers**  | `Cmd + O`                  | `Ctrl+Space` then `q` |
+| **View Pane Content**  | _(none)_                   | `Ctrl+Space` then `p` |
 | **Rename Window**      | `Cmd + Shift + R`          | `Ctrl+Space` then `,` |
 
 ## 🧭 Navigation
@@ -75,3 +76,13 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | `Ctrl + A`     | Reset — show all lines                    |
 
 > **Tip**: You can also run `~/.config/tmux/log_grabber.sh debug.log` directly to search a log file.
+
+## 🔎 Pane Viewer
+
+When you have many panes open, use the **Pane Viewer** to focus on a single pane's content in a large popup.
+
+1. Press `Prefix + p` to open the pane viewer
+2. If multiple panes exist, an **fzf picker** shows all panes with a live preview
+3. Select a pane — its full scrollback opens in `less` (starting at the bottom)
+4. Use `/pattern` to **search** (like Cmd+F), `n`/`N` for next/prev match
+5. Use `j`/`k` to scroll, `g`/`G` for top/bottom, `q` to close

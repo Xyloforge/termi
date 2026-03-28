@@ -33,10 +33,11 @@ else
     SOURCE_LABEL="📜 Scrollback"
 
     # Fast: capture last 500 lines instantly
-    tmux capture-pane -p -S -500 -J 2>/dev/null | grep -v '^[[:space:]]*$' > "$TMPFILE"
+    # -J joins soft-wrapped rows; -E - is required with -S so tmux unwraps across the range (see tmux #2688)
+    tmux capture-pane -p -J -S -500 -E - 2>/dev/null | grep -v '^[[:space:]]*$' > "$TMPFILE"
 
     # Background: capture full scrollback while user browses
-    (tmux capture-pane -p -S - -J 2>/dev/null | grep -v '^[[:space:]]*$' > "$TMPFILE_FULL") &
+    (tmux capture-pane -p -J -S - -E - 2>/dev/null | grep -v '^[[:space:]]*$' > "$TMPFILE_FULL") &
     BG_PID=$!
 fi
 
@@ -48,6 +49,9 @@ SELECTED=$(cat "$TMPFILE" | fzf \
     --tac \
     --no-sort \
     --ansi \
+    --wrap \
+    --exact \
+    --bind='space:transform-query([ -n "{q}" ] && printf "%s | " "{q}" || printf "")' \
     --prompt="  Grab: " \
     --header="$SOURCE_LABEL ($TOTAL_LINES lines)  │  TAB=select  ^E=errors  ^D=debug  ^A=all  ^Y=full history" \
     --layout=reverse \
@@ -101,9 +105,13 @@ if [[ -n "$SELECTED" ]]; then
     echo "  q = close  │  e = open in editor"
     echo ""
 
-    # Wait for keypress
+    # Wait for keypress (read from controlling tty — popup/fzf may leave stdin wrong)
     while true; do
-        read -rsn1 key
+        if [[ -r /dev/tty ]]; then
+            read -rsn1 key </dev/tty
+        else
+            read -rsn1 key
+        fi
         case "$key" in
             q|Q) break ;;
             e|E)
