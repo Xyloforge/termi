@@ -421,6 +421,14 @@ uninstall_core() {
 update_core() {
     log_info "Updating Termi configuration..."
 
+    # 0. Pull latest changes from GitHub
+    log_info "Pulling latest changes from GitHub..."
+    if git -C "$REPO_DIR" pull; then
+        log_success "Repository updated."
+    else
+        log_warn "git pull failed. Continuing with local files..."
+    fi
+
     # 1. Update Symlinks
     log_info "Refreshing symlinks..."
     mkdir -p "$CONFIG_DIR/alacritty" "$CONFIG_DIR/tmux" "$CONFIG_DIR/btop/themes"
