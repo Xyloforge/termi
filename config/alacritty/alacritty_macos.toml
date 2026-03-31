@@ -15,8 +15,8 @@ bindings = [
     { key = "Y",     mods = "Command",              chars = "\u0000c" },
 
     # Tmux navigation
-    { key = "P",     mods = "Command",              chars = "\u0000w" },
-    { key = "P",     mods = "Command|Shift",         chars = "\u0000s" },
+    { key = "P",     mods = "Command",              chars = "\u0000s" },
+    { key = "P",     mods = "Command|Shift",         chars = "\u0000p" },
     { key = "I",     mods = "Command",              chars = "\u0000f" },
     { key = "O",     mods = "Command",              chars = "\u0000q" },
 

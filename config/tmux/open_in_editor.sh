@@ -37,10 +37,32 @@ save_preferred_editor() {
     fi
 }
 
+# ── Cursor: PATH CLI or bundled app (tmux popups often miss PATH) ──
+CURSOR_MACOS_BUNDLE_BIN="/Applications/Cursor.app/Contents/Resources/app/bin/cursor"
+
+cursor_bin() {
+    if command -v cursor &>/dev/null; then
+        command -v cursor
+        return 0
+    fi
+    if [[ -x "$CURSOR_MACOS_BUNDLE_BIN" ]]; then
+        echo "$CURSOR_MACOS_BUNDLE_BIN"
+        return 0
+    fi
+    return 1
+}
+
+editor_available() {
+    case "$1" in
+        cursor) cursor_bin &>/dev/null ;;
+        *)      command -v "$1" &>/dev/null ;;
+    esac
+}
+
 # ── Detect available editors ──
 detect_editors() {
     local editors=()
-    command -v cursor &>/dev/null && editors+=("cursor")
+    cursor_bin &>/dev/null && editors+=("cursor")
     command -v antigravity &>/dev/null && editors+=("antigravity")
     command -v code &>/dev/null   && editors+=("code")
     command -v nvim &>/dev/null   && editors+=("nvim")
@@ -82,7 +104,7 @@ resolve_editor() {
     # 1. Check saved preference
     local saved
     saved=$(get_preferred_editor)
-    if [[ -n "$saved" ]] && command -v "$saved" &>/dev/null; then
+    if [[ -n "$saved" ]] && editor_available "$saved"; then
         echo "$saved"
         return
     fi
@@ -111,9 +133,36 @@ if [[ -z "$EDITOR_CMD" ]]; then
     exit 1
 fi
 
-# Write to a temp .log file so editors give it syntax highlighting
-TMPFILE=$(mktemp /tmp/grabbed_XXXXXX.log)
+# Write to a temp .log file so editors give it syntax highlighting.
+# macOS mktemp requires the template to end with exactly six X's (no suffix).
+_base=$(mktemp /tmp/grabbed_XXXXXX)
+mv "$_base" "${_base}.log"
+TMPFILE="${_base}.log"
 echo "$CONTENT" > "$TMPFILE"
 
-# Open in editor (detached so the popup can close)
-nohup "$EDITOR_CMD" "$TMPFILE" &>/dev/null &
+# Open in editor (detached so the popup can close).
+# macOS + Cursor: use `open` so Launch Services finds the app (works from tmux; bare `cursor` often missing from PATH).
+launch_editor() {
+    local cmd="$1"
+    local file="$2"
+    case "$cmd" in
+        cursor)
+            if [[ "$(uname -s)" == Darwin ]]; then
+                if open -a "Cursor" "$file" 2>/dev/null; then
+                    return 0
+                fi
+            fi
+            local cb
+            cb=$(cursor_bin) || {
+                echo "❌ Cursor not found. Install the shell command (Cmd+Shift+P → Shell Command) or install Cursor.app." >&2
+                return 1
+            }
+            nohup "$cb" "$file" &>/dev/null &
+            ;;
+        *)
+            nohup "$cmd" "$file" &>/dev/null &
+            ;;
+    esac
+}
+
+launch_editor "$EDITOR_CMD" "$TMPFILE"

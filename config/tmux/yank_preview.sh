@@ -63,7 +63,11 @@ tmux display-popup -E -w 70% -h 50% "
     cat '$PREVIEW_FILE'
     echo ''
     while true; do
-        read -rsn1 key
+        if [[ -r /dev/tty ]]; then
+            read -rsn1 key </dev/tty
+        else
+            read -rsn1 key
+        fi
         case \"\$key\" in
             q|Q) break ;;
             e|E)

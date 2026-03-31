@@ -292,6 +292,7 @@ install_core() {
     ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
     ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
     ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh" "$CONFIG_DIR/tmux/pane_viewer.sh"
     
     # Btop
     mkdir -p "$CONFIG_DIR/btop/themes"
@@ -420,6 +421,14 @@ uninstall_core() {
 update_core() {
     log_info "Updating Termi configuration..."
 
+    # 0. Pull latest changes from GitHub
+    log_info "Pulling latest changes from GitHub..."
+    if git -C "$REPO_DIR" pull; then
+        log_success "Repository updated."
+    else
+        log_warn "git pull failed. Continuing with local files..."
+    fi
+
     # 1. Update Symlinks
     log_info "Refreshing symlinks..."
     mkdir -p "$CONFIG_DIR/alacritty" "$CONFIG_DIR/tmux" "$CONFIG_DIR/btop/themes"
@@ -438,6 +447,7 @@ update_core() {
     ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
     ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
     ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh" "$CONFIG_DIR/tmux/pane_viewer.sh"
     ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 
