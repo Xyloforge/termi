@@ -36,6 +36,9 @@ bindings = [
     # Window management
     { key = "N",     mods = "Command",              action = "ToggleFullscreen" },
 
+    # Zoom / unzoom focused pane
+    { key = "Z",     mods = "Command",              chars = "\u0000Z" },
+
     # Copy-mode & Log Grabber
     { key = "F",     mods = "Command",              chars = "\u0000v" },
     { key = "G",     mods = "Command",              chars = "\u0000g" },
