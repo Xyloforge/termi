@@ -38,3 +38,10 @@ history = 10000
 
 [selection]
 save_to_clipboard = true
+
+[keyboard]
+bindings = [
+    # Ctrl+Tab / Ctrl+Shift+Tab → cycle panes in tmux
+    { key = "Tab",  mods = "Control",         chars = "\u0000\t" },
+    { key = "Tab",  mods = "Control|Shift",   chars = "\u0000T" },
+]
