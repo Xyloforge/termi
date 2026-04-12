@@ -158,6 +158,18 @@ setup_user_config() {
     log_info "Configuring Zsh for $target_user..."
     [ -f "$target_zshrc" ] || touch "$target_zshrc"
 
+    # Ensure bash hands off to zsh immediately (covers sessions where $SHELL
+    # is still bash because the usermod change hasn't been picked up yet)
+    local target_bashrc="$target_home/.bashrc"
+    if [ -f "$target_bashrc" ] && ! grep -q "exec zsh" "$target_bashrc"; then
+        echo "" >> "$target_bashrc"
+        echo "# Switch to zsh immediately if available (Termi)" >> "$target_bashrc"
+        echo "if command -v zsh &>/dev/null; then exec zsh; fi" >> "$target_bashrc"
+        if [ "$(id -u)" = "0" ] && [ "$target_user" != "root" ]; then
+            chown "$target_user:$target_user" "$target_bashrc" 2>/dev/null || true
+        fi
+    fi
+
     # Auto-Tmux
     if grep -q "Auto-Tmux Configuration" "$target_zshrc"; then
         log_info "Auto-tmux already configured for $target_user."
