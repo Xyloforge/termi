@@ -265,6 +265,14 @@ install_core() {
         git -C "$ZSH_PLUGIN_DIR/zsh-autosuggestions" pull || true
     fi
 
+    if [ ! -d "$ZSH_PLUGIN_DIR/powerlevel10k" ]; then
+        log_info "Cloning Powerlevel10k..."
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_PLUGIN_DIR/powerlevel10k"
+    else
+        log_info "Powerlevel10k already installed (pulling updates)..."
+        git -C "$ZSH_PLUGIN_DIR/powerlevel10k" pull || true
+    fi
+
     # 3. Config Linking
     log_info "Linking custom configurations..."
     
@@ -272,6 +280,9 @@ install_core() {
     # Alacritty
     mkdir -p "$CONFIG_DIR/alacritty"
     
+    # p10k config
+    ln -sf "$REPO_DIR/config/zsh/p10k.zsh" "$HOME/.p10k.zsh"
+
     # Link Common & Theme
     ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
     ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
@@ -433,9 +444,10 @@ update_core() {
     log_info "Refreshing symlinks..."
     mkdir -p "$CONFIG_DIR/alacritty" "$CONFIG_DIR/tmux" "$CONFIG_DIR/btop/themes"
 
+    ln -sf "$REPO_DIR/config/zsh/p10k.zsh" "$HOME/.p10k.zsh"
     ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
     ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
-    
+
     OS="$(uname -s)"
     if [ "$OS" = "Darwin" ]; then
         ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"

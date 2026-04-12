@@ -37,9 +37,18 @@ zle-line-init() {
 zle -N zle-line-init
 echo -ne '\e[5 q' # beam on startup
 
+# 1.7. Powerlevel10k Prompt (standalone, no Oh My Zsh required)
+#      Skip if OMZ already loaded it via ZSH_THEME
+P10K_THEME="${HOME}/.zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme"
+if [[ -z "$ZSH_THEME" ]] && [[ -f "$P10K_THEME" ]]; then
+    source "$P10K_THEME"
+fi
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
 # 2. History Search (Ctrl+R) & File Search (Ctrl+T)
 #    - Uses fzf if available for super-fast, fuzzy history search
 #    - Fallbacks to standard zsh history search if fzf is missing
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 if command -v fzf &> /dev/null; then
   # Try new fzf setup (0.48+)
   if fzf --zsh &> /dev/null; then

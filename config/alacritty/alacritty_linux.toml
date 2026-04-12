@@ -3,6 +3,9 @@ import = [
     "~/.config/alacritty/alacritty_common.toml"
 ]
 
+[window]
+decorations = "None"
+
 [keyboard]
 bindings = [
     # Linux/Windows (WSL) Keybindings
