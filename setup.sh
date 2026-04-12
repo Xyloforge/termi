@@ -30,6 +30,197 @@ log_error() {
     echo "❌ $1"
 }
 
+log_tmux_reminder() {
+    local RED='\033[1;31m'
+    local RESET='\033[0m'
+    echo ""
+    echo -e "${RED}╔══════════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${RED}║                                                          ║${RESET}"
+    echo -e "${RED}║  ACTION REQUIRED — Tmux plugins not installed yet!       ║${RESET}"
+    echo -e "${RED}║                                                          ║${RESET}"
+    echo -e "${RED}║  Inside Tmux, press:  Ctrl+Space  then  Shift+I         ║${RESET}"
+    echo -e "${RED}║  This installs all plugins on first run.                 ║${RESET}"
+    echo -e "${RED}║                                                          ║${RESET}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════╝${RESET}"
+    echo ""
+}
+
+# --- Per-User Config Setup ---
+# Sets up symlinks, zsh plugins, tmux, and zshrc for a given user.
+# Usage: setup_user_config <username> <home_dir>
+setup_user_config() {
+    local target_user="$1"
+    local target_home="$2"
+    local target_config="$target_home/.config"
+    local target_zshrc="$target_home/.zshrc"
+    local target_zsh_plugin_dir="$target_home/.zsh/plugins"
+    local target_tmux_plugin_dir="$target_home/.tmux/plugins/tpm"
+
+    log_info "Configuring for user: $target_user ($target_home)"
+
+    # 1. Zsh Plugins
+    mkdir -p "$target_zsh_plugin_dir"
+
+    if [ ! -d "$target_zsh_plugin_dir/zsh-syntax-highlighting" ]; then
+        log_info "Cloning zsh-syntax-highlighting..."
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$target_zsh_plugin_dir/zsh-syntax-highlighting"
+    else
+        log_info "zsh-syntax-highlighting already installed (pulling updates)..."
+        git -C "$target_zsh_plugin_dir/zsh-syntax-highlighting" pull || true
+    fi
+
+    if [ ! -d "$target_zsh_plugin_dir/zsh-autosuggestions" ]; then
+        log_info "Cloning zsh-autosuggestions..."
+        git clone https://github.com/zsh-users/zsh-autosuggestions "$target_zsh_plugin_dir/zsh-autosuggestions"
+    else
+        log_info "zsh-autosuggestions already installed (pulling updates)..."
+        git -C "$target_zsh_plugin_dir/zsh-autosuggestions" pull || true
+    fi
+
+    if [ ! -d "$target_zsh_plugin_dir/powerlevel10k" ]; then
+        log_info "Cloning Powerlevel10k..."
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$target_zsh_plugin_dir/powerlevel10k"
+    else
+        log_info "Powerlevel10k already installed (pulling updates)..."
+        git -C "$target_zsh_plugin_dir/powerlevel10k" pull || true
+    fi
+
+    # 2. Config Symlinks
+
+    # p10k
+    ln -sf "$REPO_DIR/config/zsh/p10k.zsh" "$target_home/.p10k.zsh"
+
+    # Alacritty
+    mkdir -p "$target_config/alacritty"
+    ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$target_config/alacritty/alacritty_common.toml"
+    ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$target_config/alacritty/catppuccin-mocha.toml"
+    if [ "$OS" = "Darwin" ]; then
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$target_config/alacritty/alacritty.toml"
+    else
+        ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$target_config/alacritty/alacritty.toml"
+    fi
+
+    # Tmux
+    mkdir -p "$target_config/tmux"
+    ln -sf "$REPO_DIR/config/tmux/tmux.conf"        "$target_config/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"   "$target_config/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"   "$target_config/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"  "$target_config/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$target_config/tmux/open_in_editor.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"   "$target_config/tmux/pane_viewer.sh"
+
+    # Btop
+    mkdir -p "$target_config/btop/themes"
+    ln -sf "$REPO_DIR/config/btop/btop.conf"                        "$target_config/btop/btop.conf"
+    ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme"    "$target_config/btop/themes/catppuccin_mocha.theme"
+
+    # Neovim
+    if [ "$INSTALL_NEOVIM" = true ]; then
+        log_info "Linking Neovim config for $target_user..."
+        if [ -d "$target_config/nvim" ] && [ ! -L "$target_config/nvim" ]; then
+            log_info "Backing up existing nvim config to nvim.bak..."
+            mv "$target_config/nvim" "$target_config/nvim.bak"
+        fi
+        ln -sfn "$REPO_DIR/config/nvim" "$target_config/nvim"
+        log_success "Neovim config linked for $target_user."
+    fi
+
+    # Fix ownership if running as root and setting up a different user
+    if [ "$(id -u)" = "0" ] && [ "$target_user" != "root" ]; then
+        chown -h "$target_user:$target_user" \
+            "$target_home/.p10k.zsh" \
+            "$target_config/alacritty/alacritty.toml" \
+            "$target_config/alacritty/alacritty_common.toml" \
+            "$target_config/alacritty/catppuccin-mocha.toml" \
+            "$target_config/tmux/tmux.conf" \
+            "$target_config/tmux/auto_resize.sh" \
+            "$target_config/tmux/log_grabber.sh" \
+            "$target_config/tmux/yank_preview.sh" \
+            "$target_config/tmux/open_in_editor.sh" \
+            "$target_config/tmux/pane_viewer.sh" \
+            "$target_config/btop/btop.conf" \
+            "$target_config/btop/themes/catppuccin_mocha.theme" 2>/dev/null || true
+        chown -R "$target_user:$target_user" "$target_zsh_plugin_dir" 2>/dev/null || true
+    fi
+
+    # 3. Tmux Plugin Manager
+    if [ ! -d "$target_tmux_plugin_dir" ]; then
+        log_info "Installing Tmux Plugin Manager for $target_user..."
+        git clone https://github.com/tmux-plugins/tpm "$target_tmux_plugin_dir"
+        if [ "$(id -u)" = "0" ] && [ "$target_user" != "root" ]; then
+            chown -R "$target_user:$target_user" "$target_home/.tmux" 2>/dev/null || true
+        fi
+    else
+        log_success "TPM already installed for $target_user."
+    fi
+
+    # 4. Zsh Integration
+    log_info "Configuring Zsh for $target_user..."
+    [ -f "$target_zshrc" ] || touch "$target_zshrc"
+
+    # Auto-Tmux
+    if grep -q "Auto-Tmux Configuration" "$target_zshrc"; then
+        log_info "Auto-tmux already configured for $target_user."
+    else
+        log_info "Adding auto-tmux logic..."
+        echo "" >> "$target_zshrc"
+        cat "$REPO_DIR/zsh/auto-tmux.zsh" >> "$target_zshrc"
+    fi
+
+    # Features
+    if grep -q "Termi Features" "$target_zshrc"; then
+        log_info "Features already configured for $target_user."
+    else
+        log_info "Adding syntax highlighting & history search..."
+        echo "" >> "$target_zshrc"
+        echo "# Termi Features (Highlighting, Autosuggestions, FZF)" >> "$target_zshrc"
+        echo "source \"$REPO_DIR/zsh/features.zsh\"" >> "$target_zshrc"
+    fi
+
+    if [ "$(id -u)" = "0" ] && [ "$target_user" != "root" ]; then
+        chown "$target_user:$target_user" "$target_zshrc" 2>/dev/null || true
+    fi
+
+    log_success "Setup complete for user: $target_user"
+}
+
+# --- Ensure Public Install Location ---
+# If REPO_DIR is inside a user home directory, offer to copy it to /opt/termi
+# so all users can read and symlink to it.
+ensure_public_install() {
+    local public_dir="/opt/termi"
+
+    # Already in a system-wide location — nothing to do
+    if [[ "$REPO_DIR" == /opt/* ]] || [[ "$REPO_DIR" == /usr/* ]] || [[ "$REPO_DIR" == /bin/* ]] || [[ "$REPO_DIR" == /srv/* ]]; then
+        return
+    fi
+
+    log_warn "Termi is at '$REPO_DIR' — not a shared system path."
+    log_info "For all users to symlink configs, it should be at a public location like '$public_dir'."
+    read -r -p "Copy to '$public_dir' now? [Y/n] " _move_reply
+    if [[ "$_move_reply" =~ ^[Nn]$ ]]; then
+        log_warn "Keeping at '$REPO_DIR'. Make sure all users can read it: chmod -R a+rX '$REPO_DIR'"
+        return
+    fi
+
+    if [ -d "$public_dir" ]; then
+        log_warn "'$public_dir' already exists."
+        read -r -p "Overwrite it? [y/N] " _overwrite_reply
+        if [[ ! "$_overwrite_reply" =~ ^[Yy]$ ]]; then
+            log_info "Using existing '$public_dir'."
+            REPO_DIR="$public_dir"
+            return
+        fi
+        rm -rf "$public_dir"
+    fi
+
+    cp -r "$REPO_DIR" "$public_dir"
+    chmod -R 755 "$public_dir"
+    log_success "Copied to $public_dir (world-readable)."
+    log_info "You can delete the original at '$REPO_DIR' once you've verified everything works."
+    REPO_DIR="$public_dir"
+}
+
 # --- Core Functions ---
 
 install_core() {
@@ -56,7 +247,7 @@ install_core() {
             log_error "Homebrew not found. Please install Homebrew first."
             exit 1
         fi
-        
+
         brew_install() {
             if ! brew list "$1" &>/dev/null; then
                 log_info "Installing $1..."
@@ -65,7 +256,7 @@ install_core() {
                 log_info "$1 is already installed."
             fi
         }
-        
+
         brew_cask_install() {
             if ! brew list --cask "$1" &>/dev/null; then
                  log_info "Installing (cask) $1..."
@@ -104,6 +295,10 @@ install_core() {
             codesign --force --deep --sign - /Applications/Alacritty.app 2>/dev/null || true
             log_success "Alacritty security fix applied."
         fi
+
+        # macOS is always single-user (current user)
+        setup_user_config "$USER" "$HOME"
+
     elif [ "$OS" = "Linux" ]; then
         log_info "Linux detected."
         # Check for apk (Alpine Linux)
@@ -114,7 +309,7 @@ install_core() {
                  log_warn "'sudo' not found. Assuming running as root."
                  sudo() { "$@"; }
             fi
-            
+
             sudo apk update
             # Core tools
             sudo apk add tmux zsh git fzf bat btop zoxide wget tar unzip lsof fontconfig
@@ -122,7 +317,7 @@ install_core() {
                 sudo apk add neovim
             fi
             # Optional: Alacritty (only if you plan to run GUI from WSL, mostly unused for headless)
-            # sudo apk add alacritty || true 
+            # sudo apk add alacritty || true
 
             log_info "Installing Oxker (Docker TUI)..."
             if ! command -v oxker &> /dev/null; then
@@ -134,7 +329,7 @@ install_core() {
                 else
                     OXKER_URL=""
                 fi
-                
+
                 if [ -n "$OXKER_URL" ]; then
                     TEMP_DIR=$(mktemp -d)
                     if wget -qO "$TEMP_DIR/oxker.tar.gz" "$OXKER_URL"; then
@@ -152,7 +347,7 @@ install_core() {
             else
                 log_info "Oxker is already installed."
             fi
-            
+
             log_info "Installing JetBrainsMono Nerd Font..."
             FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
             if [ ! -d "$FONT_DIR" ]; then
@@ -215,7 +410,7 @@ install_core() {
                 else
                     OXKER_URL=""
                 fi
-                
+
                 if [ -n "$OXKER_URL" ]; then
                     TEMP_DIR=$(mktemp -d)
                     if wget -qO "$TEMP_DIR/oxker.tar.gz" "$OXKER_URL"; then
@@ -233,7 +428,7 @@ install_core() {
             else
                 log_info "Oxker is already installed."
             fi
-            
+
             # WSL 2: fonts need to be installed in Windows, not the Linux subsystem
             if grep -q "microsoft" /proc/version 2>/dev/null; then
                 log_warn "WSL detected: Install 'JetBrainsMono Nerd Font' on Windows for Alacritty font rendering."
@@ -241,121 +436,36 @@ install_core() {
 
             log_warn "lazysql, vi-mongo, and ratisui are not in standard apt repos. Install Homebrew on Linux to get them: https://brew.sh"
         else
-            log_warn "Unsupported package manager (not apt). Please install 'alacritty', 'tmux', 'fzf', 'bat' manually."
+            log_warn "Unsupported package manager (not apt/apk). Please install 'alacritty', 'tmux', 'fzf', 'bat' manually."
         fi
-    fi
 
-    # 2. Install Zsh Tools & Plugins
-    log_info "Installing Zsh Plugins..."
-    mkdir -p "$ZSH_PLUGIN_DIR"
-    
-    if [ ! -d "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting" ]; then
-        log_info "Cloning zsh-syntax-highlighting..."
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting"
-    else
-        log_info "zsh-syntax-highlighting already installed (pulling updates)..."
-        git -C "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting" pull || true
-    fi
-    
-    if [ ! -d "$ZSH_PLUGIN_DIR/zsh-autosuggestions" ]; then
-        log_info "Cloning zsh-autosuggestions..."
-        git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGIN_DIR/zsh-autosuggestions"
-    else
-        log_info "zsh-autosuggestions already installed (pulling updates)..."
-        git -C "$ZSH_PLUGIN_DIR/zsh-autosuggestions" pull || true
-    fi
+        # 2. User scope — current user only, or all users on this system
+        echo ""
+        log_info "Who should this configuration apply to?"
+        echo "  [1] Current user only ($USER)"
+        echo "  [2] All users on this system"
+        read -r -p "Choice [1]: " _scope_reply
 
-    if [ ! -d "$ZSH_PLUGIN_DIR/powerlevel10k" ]; then
-        log_info "Cloning Powerlevel10k..."
-        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_PLUGIN_DIR/powerlevel10k"
-    else
-        log_info "Powerlevel10k already installed (pulling updates)..."
-        git -C "$ZSH_PLUGIN_DIR/powerlevel10k" pull || true
-    fi
+        if [[ "$_scope_reply" == "2" ]]; then
+            ensure_public_install
+            log_info "Setting up configuration for all users..."
 
-    # 3. Config Linking
-    log_info "Linking custom configurations..."
-    
-    # Alacritty
-    # Alacritty
-    mkdir -p "$CONFIG_DIR/alacritty"
-    
-    # p10k config
-    ln -sf "$REPO_DIR/config/zsh/p10k.zsh" "$HOME/.p10k.zsh"
+            # Root
+            setup_user_config "root" "/root"
 
-    # Link Common & Theme
-    ln -sf "$REPO_DIR/config/alacritty/alacritty_common.toml" "$CONFIG_DIR/alacritty/alacritty_common.toml"
-    ln -sf "$REPO_DIR/config/alacritty/catppuccin-mocha.toml" "$CONFIG_DIR/alacritty/catppuccin-mocha.toml"
-
-    # Link Platform Specific Config
-    if [ "$OS" = "Darwin" ]; then
-        log_info "Linking macOS Alacritty config..."
-        ln -sf "$REPO_DIR/config/alacritty/alacritty_macos.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
-    else
-        log_info "Linking Linux/WSL Alacritty config..."
-        ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
-    fi
-    
-    # Tmux
-    mkdir -p "$CONFIG_DIR/tmux"
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
-    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh" "$CONFIG_DIR/tmux/pane_viewer.sh"
-    
-    # Btop
-    mkdir -p "$CONFIG_DIR/btop/themes"
-    ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
-    ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
-
-    # Neovim
-    if [ "$INSTALL_NEOVIM" = true ]; then
-        log_info "Linking Neovim config..."
-        if [ -d "$CONFIG_DIR/nvim" ] && [ ! -L "$CONFIG_DIR/nvim" ]; then
-            log_info "Backing up existing nvim config to nvim.bak..."
-            mv "$CONFIG_DIR/nvim" "$CONFIG_DIR/nvim.bak"
+            # All home directory users
+            for user_home in /home/*/; do
+                [ -d "$user_home" ] || continue
+                u=$(basename "$user_home")
+                setup_user_config "$u" "$user_home"
+            done
+        else
+            setup_user_config "$USER" "$HOME"
         fi
-        ln -sfn "$REPO_DIR/config/nvim" "$CONFIG_DIR/nvim"
-        log_success "Neovim config linked. Plugins will auto-install on first launch."
-    fi
-
-    # 4. Tmux Plugin Manager
-    if [ ! -d "$TMUX_PLUGIN_DIR" ]; then
-        log_info "Installing Tmux Plugin Manager..."
-        git clone https://github.com/tmux-plugins/tpm "$TMUX_PLUGIN_DIR"
-    else
-        log_success "TPM already installed."
-    fi
-
-    # 5. Zsh Integration
-    log_info "Configuring Zsh..."
-    
-    AUTO_TMUX_SNIPPET="$REPO_DIR/zsh/auto-tmux.zsh"
-    FEATURES_SNIPPET="$REPO_DIR/zsh/features.zsh"
-    
-    # Auto-Tmux
-    if grep -q "Auto-Tmux Configuration" "$ZSHRC"; then
-        log_info "Auto-tmux already configured."
-    else
-        log_info "Adding auto-tmux logic..."
-        echo "" >> "$ZSHRC"
-        cat "$AUTO_TMUX_SNIPPET" >> "$ZSHRC"
-    fi
-    
-    # Features
-    if grep -q "Termi Features" "$ZSHRC"; then
-        log_info "Top-grade features already configured."
-    else
-        log_info "Adding syntax highlighting & history search..."
-        echo "" >> "$ZSHRC"
-        echo "# Termi Features (Highlighting, Autosuggestions, FZF)" >> "$ZSHRC"
-        echo "source \"$FEATURES_SNIPPET\"" >> "$ZSHRC"
     fi
 
     log_success "Setup complete! Restart your shell or launch Alacritty."
-    log_info "First run of Tmux: Press Ctrl+Space then I [shift+i] to install plugins."
+    log_tmux_reminder
 }
 
 uninstall_core() {
@@ -384,13 +494,13 @@ uninstall_core() {
         log_info "Removing Auto-Tmux snippet from $ZSHRC..."
         cp "$ZSHRC" "${ZSHRC}.bak"
         log_info "(Backup saved to ${ZSHRC}.bak)"
-        
+
         if [[ "$(uname)" == "Darwin" ]]; then
             sed -i '' '/# Auto-Tmux Configuration (Added by Install Script)/,+8d' "$ZSHRC"
         else
             sed -i '/# Auto-Tmux Configuration (Added by Install Script)/,+8d' "$ZSHRC"
         fi
-        
+
         # Also try to remove the features block if we added it
         if grep -q "Termi Features" "$ZSHRC"; then
              log_info "Removing Termi Features snippet..."
@@ -454,21 +564,20 @@ update_core() {
     else
         ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
     fi
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf" "$CONFIG_DIR/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh" "$CONFIG_DIR/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh" "$CONFIG_DIR/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh" "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/tmux.conf"         "$CONFIG_DIR/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"    "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"    "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"   "$CONFIG_DIR/tmux/yank_preview.sh"
     ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh" "$CONFIG_DIR/tmux/pane_viewer.sh"
-    ln -sf "$REPO_DIR/config/btop/btop.conf" "$CONFIG_DIR/btop/btop.conf"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"    "$CONFIG_DIR/tmux/pane_viewer.sh"
+    ln -sf "$REPO_DIR/config/btop/btop.conf"         "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 
     # 2. Add Auto-Tmux to Zsh (if missing)
-    AUTO_TMUX_SNIPPET="$REPO_DIR/zsh/auto-tmux.zsh"
     if ! grep -q "Auto-Tmux Configuration" "$ZSHRC"; then
         log_info "Adding missing auto-tmux logic to $ZSHRC..."
         echo "" >> "$ZSHRC"
-        cat "$AUTO_TMUX_SNIPPET" >> "$ZSHRC"
+        cat "$REPO_DIR/zsh/auto-tmux.zsh" >> "$ZSHRC"
     fi
 
     # 3. Reload Alacritty
@@ -486,7 +595,7 @@ update_core() {
         else
             log_warn "Tmux reload check failed. Check syntax or logs."
         fi
-        
+
         if [ -d "$TMUX_PLUGIN_DIR" ]; then
              log_info "Note: To update Tmux plugins, press Prefix + U inside Tmux."
         fi
