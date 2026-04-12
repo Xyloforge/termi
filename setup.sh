@@ -188,7 +188,12 @@ setup_user_config() {
         log_warn "zsh not found — skipping shell change for $target_user. Install zsh first."
     else
         local current_shell
-        current_shell="$(getent passwd "$target_user" 2>/dev/null | cut -d: -f7)"
+        # getent is Linux-only; fall back to dscl on macOS
+        if command -v getent &>/dev/null; then
+            current_shell="$(getent passwd "$target_user" 2>/dev/null | cut -d: -f7)"
+        else
+            current_shell="$(dscl . -read /Users/"$target_user" UserShell 2>/dev/null | awk '{print $2}')"
+        fi
         if [[ "$current_shell" == "$zsh_path" ]]; then
             log_info "Default shell is already zsh for $target_user."
         else
