@@ -181,6 +181,30 @@ setup_user_config() {
         chown "$target_user:$target_user" "$target_zshrc" 2>/dev/null || true
     fi
 
+    # 5. Set default shell to zsh
+    local zsh_path
+    zsh_path="$(command -v zsh 2>/dev/null)"
+    if [ -z "$zsh_path" ]; then
+        log_warn "zsh not found — skipping shell change for $target_user. Install zsh first."
+    else
+        local current_shell
+        current_shell="$(getent passwd "$target_user" 2>/dev/null | cut -d: -f7)"
+        if [[ "$current_shell" == "$zsh_path" ]]; then
+            log_info "Default shell is already zsh for $target_user."
+        else
+            log_info "Changing default shell to zsh for $target_user..."
+            if [ "$(id -u)" = "0" ]; then
+                usermod -s "$zsh_path" "$target_user" 2>/dev/null \
+                    || chsh -s "$zsh_path" "$target_user" 2>/dev/null \
+                    || log_warn "Could not change shell for $target_user. Run manually: chsh -s $zsh_path $target_user"
+            else
+                chsh -s "$zsh_path" \
+                    || log_warn "Could not change shell. Run manually: chsh -s $zsh_path"
+            fi
+            log_success "Default shell set to zsh for $target_user. Takes effect on next login."
+        fi
+    fi
+
     log_success "Setup complete for user: $target_user"
 }
 
