@@ -1,9 +1,7 @@
-[general]
 import = ["~/.config/alacritty/alacritty_common.toml"]
 
-[shell]
-program = "wsl.exe"
-args = ["-d", "Ubuntu"]
+[terminal]
+shell = { program = "wsl.exe", args = ["-d", "Ubuntu"] }
 
 [keyboard]
 bindings = [

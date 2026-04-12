@@ -2,7 +2,6 @@
 # ║  Zenith Alacritty Config (Common)                           ║
 # ╚══════════════════════════════════════════════════════════════╝
 
-[general]
 import = [
     "~/.config/alacritty/catppuccin-mocha.toml"
 ]
