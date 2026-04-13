@@ -29,6 +29,7 @@ bindings = [
     { key = "J",     mods = "Alt",              chars = "\u0000J" },
     { key = "K",     mods = "Alt",              chars = "\u0000K" },
     { key = "L",     mods = "Alt",              chars = "\u0000L" },
+    { key = "Z",     mods = "Alt",              chars = "\u0000z" },
 
     # Rename window
     { key = "R",     mods = "Alt|Shift",         chars = "\u0000," },

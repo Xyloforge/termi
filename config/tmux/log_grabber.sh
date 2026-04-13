@@ -44,12 +44,20 @@ fi
 TOTAL_LINES=$(wc -l < "$TMPFILE" | tr -d ' ')
 
 # ── fzf with lazy-load + filter keybinds + bottom preview ──
+# --wrap requires fzf >= 0.54.0; detect at runtime
+_fzf_ver=$(fzf --version 2>/dev/null | grep -oE '^[0-9]+\.[0-9]+' | head -1)
+_fzf_minor=$(echo "$_fzf_ver" | cut -d. -f2)
+FZF_WRAP=""
+if [[ "${_fzf_minor:-0}" -ge 54 ]]; then
+    FZF_WRAP="--wrap"
+fi
+
 SELECTED=$(cat "$TMPFILE" | fzf \
     --multi \
     --tac \
     --no-sort \
     --ansi \
-    --wrap \
+    ${FZF_WRAP:+$FZF_WRAP} \
     --exact \
     --bind='space:transform-query([ -n "{q}" ] && printf "%s | " "{q}" || printf "")' \
     --prompt="  Grab: " \
