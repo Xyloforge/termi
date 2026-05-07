@@ -59,22 +59,7 @@ PREVIEW_FILE=$(mktemp /tmp/yank_preview.XXXXXX)
 } > "$PREVIEW_FILE"
 
 # ── Show in tmux popup (interactive: q=close, e=editor) ──
-tmux display-popup -E -w 70% -h 50% "
-    cat '$PREVIEW_FILE'
-    echo ''
-    while true; do
-        if [[ -r /dev/tty ]]; then
-            read -rsn1 key </dev/tty
-        else
-            read -rsn1 key
-        fi
-        case \"\$key\" in
-            q|Q) break ;;
-            e|E)
-                cat '$PREVIEW_FILE' | sed '1,/─────/d' | sed '/─────/,\$d' | sed '/^$/d' | ~/.config/tmux/open_in_editor.sh
-                break
-                ;;
-        esac
-    done
-    rm -f '$PREVIEW_FILE'
-"
+# Body lives in its own bash-shebanged file so zsh users (default-shell=zsh)
+# don't trip on `read -rsn1` which is bash-only flag syntax.
+tmux display-popup -E -w 70% -h 50% \
+    "$SCRIPT_DIR/yank_preview_show.sh '$PREVIEW_FILE'"

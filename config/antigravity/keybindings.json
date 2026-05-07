@@ -1,0 +1,25 @@
+// Antigravity keybindings
+// macOS: cmd = Command key
+// Windows/Linux: replace "cmd" with "ctrl" where needed
+[
+    {
+        "key": "",
+        "command": "workbench.action.openAntigravitySettings"
+    },
+    {
+        "key": "cmd+,",
+        "command": "-workbench.action.openAntigravitySettings"
+    },
+    {
+        "key": "shift+cmd+,",
+        "command": "workbench.action.openSettings"
+    },
+    {
+        "key": "cmd+,",
+        "command": "-workbench.action.openSettings"
+    },
+    {
+        "key": "shift+alt+f",
+        "command": "editor.action.formatDocument"
+    }
+]

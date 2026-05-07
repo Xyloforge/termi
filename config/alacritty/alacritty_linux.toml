@@ -45,6 +45,9 @@ bindings = [
     { key = "F",     mods = "Alt",              chars = "\u0000v" },
     { key = "G",     mods = "Alt",              chars = "\u0000g" },
 
+    # Command Palette (Raycast-style fuzzy launcher) -> Prefix + /
+    { key = "Slash", mods = "Alt",              chars = "\u0000/" },
+
     # Clipboard (Ctrl+Shift+C/V is standard on Linux terminals)
     { key = "C",     mods = "Control|Shift",     action = "Copy" },
     { key = "V",     mods = "Control|Shift",     action = "Paste" },

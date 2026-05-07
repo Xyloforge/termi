@@ -1,0 +1,37 @@
+// Cursor keybindings
+// macOS: cmd = Command key
+// Windows/Linux: replace "cmd" with "ctrl" where needed
+[
+    {
+        "key": "ctrl+,",
+        "command": "workbench.action.openSettings"
+    },
+    {
+        "key": "cmd+,",
+        "command": "-workbench.action.openSettings"
+    },
+    {
+        "key": "cmd+,",
+        "command": "editor.action.formatDocument",
+        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    },
+    {
+        "key": "shift+alt+f",
+        "command": "-editor.action.formatDocument",
+        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    },
+    {
+        "key": "cmd+0",
+        "command": "-workbench.action.focusSideBar",
+        "when": "!isAuxiliaryWindowFocusedContext"
+    },
+    {
+        "key": "cmd+0",
+        "command": "-glass.zoomReset",
+        "when": "glassNoModalOpen && isGlassEmptyWorkspace"
+    },
+    {
+        "key": "cmd+0",
+        "command": "editor.cpp.toggle"
+    }
+]

@@ -102,12 +102,20 @@ setup_user_config() {
 
     # Tmux
     mkdir -p "$target_config/tmux"
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf"        "$target_config/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"   "$target_config/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"   "$target_config/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"  "$target_config/tmux/yank_preview.sh"
-    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$target_config/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"   "$target_config/tmux/pane_viewer.sh"
+    ln -sf "$REPO_DIR/config/tmux/tmux.conf"             "$target_config/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"        "$target_config/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"        "$target_config/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"       "$target_config/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview_show.sh"  "$target_config/tmux/yank_preview_show.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh"     "$target_config/tmux/open_in_editor.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"        "$target_config/tmux/pane_viewer.sh"
+    ln -sf "$REPO_DIR/config/tmux/command_palette.sh"    "$target_config/tmux/command_palette.sh"
+    ln -sf "$REPO_DIR/config/tmux/window_finder.sh"      "$target_config/tmux/window_finder.sh"
+    ln -sf "$REPO_DIR/config/tmux/session_finder.sh"     "$target_config/tmux/session_finder.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_borrow.sh"     "$target_config/tmux/scratch_borrow.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$target_config/tmux/scratch_return.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$target_config/tmux/scratch_return_one.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$target_config/tmux/scratch_cleanup.sh"
 
     # Btop
     mkdir -p "$target_config/btop/themes"
@@ -136,8 +144,16 @@ setup_user_config() {
             "$target_config/tmux/auto_resize.sh" \
             "$target_config/tmux/log_grabber.sh" \
             "$target_config/tmux/yank_preview.sh" \
+            "$target_config/tmux/yank_preview_show.sh" \
             "$target_config/tmux/open_in_editor.sh" \
             "$target_config/tmux/pane_viewer.sh" \
+            "$target_config/tmux/command_palette.sh" \
+            "$target_config/tmux/window_finder.sh" \
+            "$target_config/tmux/session_finder.sh" \
+            "$target_config/tmux/scratch_borrow.sh" \
+            "$target_config/tmux/scratch_return.sh" \
+            "$target_config/tmux/scratch_return_one.sh" \
+            "$target_config/tmux/scratch_cleanup.sh" \
             "$target_config/btop/btop.conf" \
             "$target_config/btop/themes/catppuccin_mocha.theme" 2>/dev/null || true
         chown -R "$target_user:$target_user" "$target_zsh_plugin_dir" 2>/dev/null || true
@@ -605,13 +621,21 @@ update_core() {
     else
         ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
     fi
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf"         "$CONFIG_DIR/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"    "$CONFIG_DIR/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"    "$CONFIG_DIR/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"   "$CONFIG_DIR/tmux/yank_preview.sh"
-    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh" "$CONFIG_DIR/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"    "$CONFIG_DIR/tmux/pane_viewer.sh"
-    ln -sf "$REPO_DIR/config/btop/btop.conf"         "$CONFIG_DIR/btop/btop.conf"
+    ln -sf "$REPO_DIR/config/tmux/tmux.conf"             "$CONFIG_DIR/tmux/tmux.conf"
+    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"        "$CONFIG_DIR/tmux/auto_resize.sh"
+    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"        "$CONFIG_DIR/tmux/log_grabber.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"       "$CONFIG_DIR/tmux/yank_preview.sh"
+    ln -sf "$REPO_DIR/config/tmux/yank_preview_show.sh"  "$CONFIG_DIR/tmux/yank_preview_show.sh"
+    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh"     "$CONFIG_DIR/tmux/open_in_editor.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"        "$CONFIG_DIR/tmux/pane_viewer.sh"
+    ln -sf "$REPO_DIR/config/tmux/command_palette.sh"    "$CONFIG_DIR/tmux/command_palette.sh"
+    ln -sf "$REPO_DIR/config/tmux/window_finder.sh"      "$CONFIG_DIR/tmux/window_finder.sh"
+    ln -sf "$REPO_DIR/config/tmux/session_finder.sh"     "$CONFIG_DIR/tmux/session_finder.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_borrow.sh"     "$CONFIG_DIR/tmux/scratch_borrow.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$CONFIG_DIR/tmux/scratch_return.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$CONFIG_DIR/tmux/scratch_return_one.sh"
+    ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$CONFIG_DIR/tmux/scratch_cleanup.sh"
+    ln -sf "$REPO_DIR/config/btop/btop.conf"             "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 
     # 2. Add Auto-Tmux to Zsh (if missing)
