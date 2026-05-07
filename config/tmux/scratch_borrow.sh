@@ -80,10 +80,10 @@ CHOICE=$(echo "$PICKER_DATA" | fzf \
     --header='Pick a pane · Tab / Shift+Tab navigate · Ctrl+/ resize preview · Esc cancel' \
     --layout=reverse --border=none --height=100% \
     --delimiter='|' --with-nth=2 --no-info --ansi \
-    --preview='tmux capture-pane -pe -t {1} 2>/dev/null || echo "(pane unavailable)"' \
-    --preview-window='right,55%,border-left,wrap' \
+    --preview='~/.config/tmux/preview_target.sh {1}' \
+    --preview-window='bottom,60%,border-top,wrap' \
     --bind='tab:down,btab:up' \
-    --bind='ctrl-/:change-preview-window(down,50%|hidden|right,55%)' \
+    --bind='ctrl-/:change-preview-window(right,55%,border-left|hidden|bottom,60%,border-top)' \
     --color='bg+:#313244,fg+:#CDD6F4,hl:#89B4FA,hl+:#89B4FA,pointer:#89B4FA,prompt:#89B4FA,header:#585B70,preview-bg:#1E1E2E,preview-fg:#CDD6F4,preview-border:#313244')
 
 [ -z "$CHOICE" ] && exit 0

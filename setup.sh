@@ -116,6 +116,7 @@ setup_user_config() {
     ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$target_config/tmux/scratch_return.sh"
     ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$target_config/tmux/scratch_return_one.sh"
     ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$target_config/tmux/scratch_cleanup.sh"
+    ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$target_config/tmux/preview_target.sh"
 
     # Btop
     mkdir -p "$target_config/btop/themes"
@@ -154,6 +155,7 @@ setup_user_config() {
             "$target_config/tmux/scratch_return.sh" \
             "$target_config/tmux/scratch_return_one.sh" \
             "$target_config/tmux/scratch_cleanup.sh" \
+            "$target_config/tmux/preview_target.sh" \
             "$target_config/btop/btop.conf" \
             "$target_config/btop/themes/catppuccin_mocha.theme" 2>/dev/null || true
         chown -R "$target_user:$target_user" "$target_zsh_plugin_dir" 2>/dev/null || true
@@ -635,6 +637,7 @@ update_core() {
     ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$CONFIG_DIR/tmux/scratch_return.sh"
     ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$CONFIG_DIR/tmux/scratch_return_one.sh"
     ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$CONFIG_DIR/tmux/scratch_cleanup.sh"
+    ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$CONFIG_DIR/tmux/preview_target.sh"
     ln -sf "$REPO_DIR/config/btop/btop.conf"             "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 
