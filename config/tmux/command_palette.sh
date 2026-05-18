@@ -32,6 +32,7 @@ zoom|  Zoom toggle current pane|Prefix+z
 display_panes|  Show pane numbers|Prefix+o
 swap_pane_next|  Swap with next pane|—
 swap_pane_prev|  Swap with previous pane|—
+swap_pane_drag|  Swap panes by dragging (info)|Option+drag
 break_pane|  Break pane into new window|—
 choose_window|  Choose window (visual tree)|Prefix+p
 choose_session|  Choose session (visual tree)|—
@@ -52,6 +53,7 @@ clock_mode|  Show clock|—
 google_search|  Google search prompt|Prefix+G
 reload_config|  Reload tmux config|Prefix+r
 list_keys|  Show all keybindings|Prefix+? (default)
+find_process|  Find & kill process (fzf)|Cmd+Shift+F
 EOF
 )
 
@@ -98,6 +100,7 @@ case "$CHOICE" in
     display_panes)      defer display-panes ;;
     swap_pane_next)     tmux swap-pane -D ;;
     swap_pane_prev)     tmux swap-pane -U ;;
+    swap_pane_drag)     tmux display-message "  Hold Option and drag a pane onto another to swap" ;;
     break_pane)         tmux break-pane ;;
     choose_window)      defer choose-tree -Zw ;;
     choose_session)     defer choose-tree -Zs ;;
@@ -118,4 +121,5 @@ case "$CHOICE" in
     google_search)      defer command-prompt -p "🔍 Google:" "run-shell '$OPENER \"https://www.google.com/search?q=%1\"'" ;;
     reload_config)      tmux source-file ~/.config/tmux/tmux.conf \; display-message "  Config Reloaded" ;;
     list_keys)          defer list-keys ;;
+    find_process)       defer display-popup -E -w 90% -h 90% "bash ~/.config/tmux/find_process_fzf.sh" ;;
 esac

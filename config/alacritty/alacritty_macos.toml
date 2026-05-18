@@ -39,8 +39,9 @@ bindings = [
     # Zoom / unzoom focused pane
     { key = "Z",     mods = "Command",              chars = "\u0000z" },
 
-    # Copy-mode & Log Grabber
+    # Copy-mode, Log Grabber & Find Process
     { key = "F",     mods = "Command",              chars = "\u0000v" },
+    { key = "F",     mods = "Command|Shift",         chars = "\u0000F" },
     { key = "G",     mods = "Command",              chars = "\u0000g" },
 
     # Command Palette (Raycast-style fuzzy launcher) -> Prefix + /

@@ -117,6 +117,8 @@ setup_user_config() {
     ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$target_config/tmux/scratch_return_one.sh"
     ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$target_config/tmux/scratch_cleanup.sh"
     ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$target_config/tmux/preview_target.sh"
+    ln -sf "$REPO_DIR/config/tmux/pane_drag_swap.sh"      "$target_config/tmux/pane_drag_swap.sh"
+    ln -sf "$REPO_DIR/config/tmux/find_process_fzf.sh"  "$target_config/tmux/find_process_fzf.sh"
 
     # Btop
     mkdir -p "$target_config/btop/themes"
@@ -156,6 +158,8 @@ setup_user_config() {
             "$target_config/tmux/scratch_return_one.sh" \
             "$target_config/tmux/scratch_cleanup.sh" \
             "$target_config/tmux/preview_target.sh" \
+            "$target_config/tmux/pane_drag_swap.sh" \
+            "$target_config/tmux/find_process_fzf.sh" \
             "$target_config/btop/btop.conf" \
             "$target_config/btop/themes/catppuccin_mocha.theme" 2>/dev/null || true
         chown -R "$target_user:$target_user" "$target_zsh_plugin_dir" 2>/dev/null || true
