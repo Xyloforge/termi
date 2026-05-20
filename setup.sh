@@ -119,6 +119,7 @@ setup_user_config() {
     ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$target_config/tmux/preview_target.sh"
     ln -sf "$REPO_DIR/config/tmux/pane_drag_swap.sh"      "$target_config/tmux/pane_drag_swap.sh"
     ln -sf "$REPO_DIR/config/tmux/find_process_fzf.sh"  "$target_config/tmux/find_process_fzf.sh"
+    ln -sf "$REPO_DIR/config/tmux/swap_last_window.sh"  "$target_config/tmux/swap_last_window.sh"
 
     # Btop
     mkdir -p "$target_config/btop/themes"

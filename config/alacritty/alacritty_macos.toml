@@ -36,6 +36,9 @@ bindings = [
     # Window management
     { key = "N",     mods = "Command",              action = "ToggleFullscreen" },
 
+    # Last-window swap (CS-style Q: jump back to previous window)
+    { key = "A",     mods = "Command",              chars = "\u0000a" },
+
     # Zoom / unzoom focused pane
     { key = "Z",     mods = "Command",              chars = "\u0000z" },
 
