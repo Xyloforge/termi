@@ -30,8 +30,10 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | **Move Focus Down**  | `Cmd + J`      | `Ctrl+Space` then `j`                         |
 | **Move Focus Up**    | `Cmd + K`      | `Ctrl+Space` then `k`                         |
 | **Move Focus Right** | `Cmd + L`      | `Ctrl+Space` then `l`                         |
-| **Fullscreen**       | `Cmd + N`      | `Ctrl+Space` then `z` (Zoom pane)             |
-| **Auto Resize Mode** | _(none)_       | `Ctrl+Space` then `a` (Auto-zoom small panes) |
+| **Fullscreen**       | `Cmd + N`      | Alacritty fullscreen                        |
+| **Zoom / Unzoom**     | `Cmd + Z`      | `Ctrl+Space` then `z`                        |
+| **Last Used Window**  | `Cmd + A`      | `Ctrl+Space` then `a` (cross-session)        |
+| **Auto Resize Mode** | _(none)_       | `Ctrl+Space` then `A` (Auto-resize small panes) |
 
 ## 🛠 Session Management
 
@@ -39,7 +41,7 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | :------------------ | :------------------------------------------------- |
 | **Detach Session**  | `Ctrl+Space` then `d`                              |
 | **Rename Session**  | `Ctrl+Space` then `$`                              |
-| **Save State**      | `Ctrl+Space` then `Ctrl + s` (Auto-saves every 5m) |
+| **Save State**      | `Ctrl+Space` then `Ctrl + s` (Auto-saves every minute + layout changes) |
 | **Restore State**   | `Ctrl+Space` then `Ctrl + r` (Auto-loads on boot)  |
 | **Reload Config**   | `Ctrl+Space` then `r`                              |
 | **Install Plugins** | `Ctrl+Space` then `I` (Capital i)                  |

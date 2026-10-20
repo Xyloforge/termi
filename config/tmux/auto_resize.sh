@@ -1,41 +1,31 @@
 #!/usr/bin/env bash
+# The focus hook supplies its pane. Never guess a client in a multi-client server.
+set -eu
+pane=${2:?pane id required}
+IFS='|' read -r window width height zoomed < <(
+    tmux display-message -p -t "$pane" '#{window_id}|#{pane_width}|#{pane_height}|#{window_zoomed_flag}'
+)
+[ -n "$window" ] || exit 0
+# Manual zoom takes precedence over automatic layout changes.
+[ "$zoomed" = 0 ] || exit 0
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-# Configuration: Define your "Comfort Zone"
-TARGET_W=25
-TARGET_H=25
-
-if [ "$1" = "in" ]; then
-    # 1. Get current dimensions
-    W=$(tmux display-message -p '#{pane_width}')
-    H=$(tmux display-message -p '#{pane_height}')
-    
-    # 2. Save layout ONLY if we are about to change something
-    if [ "$W" -lt "$TARGET_W" ] || [ "$H" -lt "$TARGET_H" ]; then
-        LAYOUT=$(tmux display-message -p '#{window_layout}')
-        tmux set-window-option -pq @saved_layout "$LAYOUT"
-
-        # 3. Smart Resize Logic
-        # If width is small, expand width. If height is small, expand height.
-        # This allows tmux to keep your other splits alive.
-        if [ "$W" -lt "$TARGET_W" ] && [ "$H" -lt "$TARGET_H" ]; then
-            # Both small? Resize both.
-            tmux resize-pane -x "$TARGET_W" -y "$TARGET_H"
-        elif [ "$W" -lt "$TARGET_W" ]; then
-            # Just narrow? Only touch width.
-            tmux resize-pane -x "$TARGET_W"
-        elif [ "$H" -lt "$TARGET_H" ]; then
-            # Just short? Only touch height.
-            tmux resize-pane -y "$TARGET_H"
+case "${1:-}" in
+    in)
+        if [ "$width" -lt 25 ] || [ "$height" -lt 25 ]; then
+            saved=$(tmux show-option -wqv -t "$window" @saved_layout)
+            if [ -z "$saved" ]; then
+                layout=$(tmux display-message -p -t "$pane" '#{window_layout}')
+                tmux set-option -wq -t "$window" @saved_layout "$layout"
+            fi
+            if [ "$width" -lt 25 ]; then tmux resize-pane -t "$pane" -x 25; fi
+            if [ "$height" -lt 25 ]; then tmux resize-pane -t "$pane" -y 25; fi
         fi
-    fi
-
-elif [ "$1" = "out" ]; then
-    SAVED=$(tmux display-message -p '#{@saved_layout}')
-    if [ -n "$SAVED" ]; then
-        # Use -q to prevent flickering from error messages
-        tmux select-layout -q "$SAVED"
-        tmux set-window-option -pq -u @saved_layout
-    fi
-fi
+        ;;
+    out)
+        saved=$(tmux show-option -wqv -t "$window" @saved_layout)
+        if [ -n "$saved" ]; then
+            tmux select-layout -t "$window" "$saved" >/dev/null 2>&1 || true
+            tmux set-option -wu -t "$window" @saved_layout
+        fi
+        ;;
+esac

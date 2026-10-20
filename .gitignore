@@ -7,3 +7,7 @@ config/tmux/test.conf
 
 # macOS
 .DS_Store
+
+# Python helper/test caches
+__pycache__/
+*.pyc

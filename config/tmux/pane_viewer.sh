@@ -54,4 +54,6 @@ fi
 # ── Focus: select the pane and zoom it to fill the window ──
 # The popup closes when this script exits, revealing the zoomed pane.
 tmux select-pane -t "$TARGET_PANE"
-tmux resize-pane -Z -t "$TARGET_PANE"
+if [ "$(tmux display-message -p -t "$TARGET_PANE" '#{window_zoomed_flag}')" != 1 ]; then
+    tmux resize-pane -Z -t "$TARGET_PANE"
+fi

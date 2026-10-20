@@ -102,24 +102,9 @@ setup_user_config() {
 
     # Tmux
     mkdir -p "$target_config/tmux"
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf"             "$target_config/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"        "$target_config/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"        "$target_config/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"       "$target_config/tmux/yank_preview.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview_show.sh"  "$target_config/tmux/yank_preview_show.sh"
-    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh"     "$target_config/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"        "$target_config/tmux/pane_viewer.sh"
-    ln -sf "$REPO_DIR/config/tmux/command_palette.sh"    "$target_config/tmux/command_palette.sh"
-    ln -sf "$REPO_DIR/config/tmux/window_finder.sh"      "$target_config/tmux/window_finder.sh"
-    ln -sf "$REPO_DIR/config/tmux/session_finder.sh"     "$target_config/tmux/session_finder.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_borrow.sh"     "$target_config/tmux/scratch_borrow.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$target_config/tmux/scratch_return.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$target_config/tmux/scratch_return_one.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$target_config/tmux/scratch_cleanup.sh"
-    ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$target_config/tmux/preview_target.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_drag_swap.sh"      "$target_config/tmux/pane_drag_swap.sh"
-    ln -sf "$REPO_DIR/config/tmux/find_process_fzf.sh"  "$target_config/tmux/find_process_fzf.sh"
-    ln -sf "$REPO_DIR/config/tmux/swap_last_window.sh"  "$target_config/tmux/swap_last_window.sh"
+    for helper in "$REPO_DIR"/config/tmux/tmux.conf "$REPO_DIR"/config/tmux/*.sh "$REPO_DIR"/config/tmux/*.py; do
+        ln -sf "$helper" "$target_config/tmux/$(basename "$helper")"
+    done
 
     # Btop
     mkdir -p "$target_config/btop/themes"
@@ -193,14 +178,8 @@ setup_user_config() {
         fi
     fi
 
-    # Auto-Tmux
-    if grep -q "Auto-Tmux Configuration" "$target_zshrc"; then
-        log_info "Auto-tmux already configured for $target_user."
-    else
-        log_info "Adding auto-tmux logic..."
-        echo "" >> "$target_zshrc"
-        cat "$REPO_DIR/zsh/auto-tmux.zsh" >> "$target_zshrc"
-    fi
+    # Source a managed file and migrate the legacy copied startup block.
+    python3 "$REPO_DIR/scripts/configure_shell.py" "$target_zshrc" "$REPO_DIR/zsh/auto-tmux.zsh"
 
     # Features
     if grep -q "Termi Features" "$target_zshrc"; then
@@ -339,6 +318,7 @@ install_core() {
         brew tap honhimW/tap 2>/dev/null || true
 
         brew_install tmux
+        brew_install python
         brew_install fzf
         brew_install bat
         brew_install btop
@@ -376,7 +356,7 @@ install_core() {
 
             sudo apk update
             # Core tools
-            sudo apk add tmux zsh git fzf bat btop zoxide wget tar unzip lsof fontconfig
+            sudo apk add python3 tmux zsh git fzf bat btop zoxide wget tar unzip lsof fontconfig
             if [ "$INSTALL_NEOVIM" = true ]; then
                 sudo apk add neovim
             fi
@@ -440,7 +420,7 @@ install_core() {
         # Check for apt-get (Debian/Ubuntu/WSL)
         elif command -v apt-get &> /dev/null; then
             sudo apt-get update
-            sudo apt-get install -y tmux fzf bat btop zoxide wget tar unzip fontconfig lsof
+            sudo apt-get install -y python3 tmux fzf bat btop zoxide wget tar unzip fontconfig lsof
             if [ "$INSTALL_NEOVIM" = true ]; then
                 sudo apt-get install -y neovim
             fi
@@ -553,27 +533,9 @@ uninstall_core() {
         rm -rf "$TMUX_PLUGIN_DIR"
     fi
 
-    # 3. Clean .zshrc
-    if grep -q "Auto-Tmux Configuration" "$ZSHRC"; then
-        log_info "Removing Auto-Tmux snippet from $ZSHRC..."
-        cp "$ZSHRC" "${ZSHRC}.bak"
-        log_info "(Backup saved to ${ZSHRC}.bak)"
-
-        if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' '/# Auto-Tmux Configuration (Added by Install Script)/,+8d' "$ZSHRC"
-        else
-            sed -i '/# Auto-Tmux Configuration (Added by Install Script)/,+8d' "$ZSHRC"
-        fi
-
-        # Also try to remove the features block if we added it
-        if grep -q "Termi Features" "$ZSHRC"; then
-             log_info "Removing Termi Features snippet..."
-             if [[ "$(uname)" == "Darwin" ]]; then
-                sed -i '' '/# Termi Features (Highlighting, Autosuggestions, FZF)/,+2d' "$ZSHRC"
-             else
-                sed -i '/# Termi Features (Highlighting, Autosuggestions, FZF)/,+2d' "$ZSHRC"
-             fi
-        fi
+    # 3. Remove the complete managed/legacy startup block, with a backup.
+    if [ -f "$ZSHRC" ]; then
+        python3 "$REPO_DIR/scripts/configure_shell.py" "$ZSHRC" --remove
     fi
 
     log_success "Configurations removed."
@@ -606,12 +568,19 @@ uninstall_core() {
 update_core() {
     log_info "Updating Termi configuration..."
 
-    # 0. Pull latest changes from GitHub
-    log_info "Pulling latest changes from GitHub..."
-    if git -C "$REPO_DIR" pull; then
-        log_success "Repository updated."
-    else
-        log_warn "git pull failed. Continuing with local files..."
+    if ! command -v python3 >/dev/null 2>&1; then
+        log_error "Python 3 is required for resilient session saves. Run ./setup.sh install first."
+        return 1
+    fi
+
+    # `reload` applies local changes without pulling or installing packages.
+    if [ "${1:-}" != --local ]; then
+        log_info "Pulling latest changes from GitHub..."
+        if git -C "$REPO_DIR" pull; then
+            log_success "Repository updated."
+        else
+            log_warn "git pull failed. Continuing with local files..."
+        fi
     fi
 
     # 1. Update Symlinks
@@ -628,30 +597,14 @@ update_core() {
     else
         ln -sf "$REPO_DIR/config/alacritty/alacritty_linux.toml" "$CONFIG_DIR/alacritty/alacritty.toml"
     fi
-    ln -sf "$REPO_DIR/config/tmux/tmux.conf"             "$CONFIG_DIR/tmux/tmux.conf"
-    ln -sf "$REPO_DIR/config/tmux/auto_resize.sh"        "$CONFIG_DIR/tmux/auto_resize.sh"
-    ln -sf "$REPO_DIR/config/tmux/log_grabber.sh"        "$CONFIG_DIR/tmux/log_grabber.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview.sh"       "$CONFIG_DIR/tmux/yank_preview.sh"
-    ln -sf "$REPO_DIR/config/tmux/yank_preview_show.sh"  "$CONFIG_DIR/tmux/yank_preview_show.sh"
-    ln -sf "$REPO_DIR/config/tmux/open_in_editor.sh"     "$CONFIG_DIR/tmux/open_in_editor.sh"
-    ln -sf "$REPO_DIR/config/tmux/pane_viewer.sh"        "$CONFIG_DIR/tmux/pane_viewer.sh"
-    ln -sf "$REPO_DIR/config/tmux/command_palette.sh"    "$CONFIG_DIR/tmux/command_palette.sh"
-    ln -sf "$REPO_DIR/config/tmux/window_finder.sh"      "$CONFIG_DIR/tmux/window_finder.sh"
-    ln -sf "$REPO_DIR/config/tmux/session_finder.sh"     "$CONFIG_DIR/tmux/session_finder.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_borrow.sh"     "$CONFIG_DIR/tmux/scratch_borrow.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_return.sh"     "$CONFIG_DIR/tmux/scratch_return.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_return_one.sh" "$CONFIG_DIR/tmux/scratch_return_one.sh"
-    ln -sf "$REPO_DIR/config/tmux/scratch_cleanup.sh"    "$CONFIG_DIR/tmux/scratch_cleanup.sh"
-    ln -sf "$REPO_DIR/config/tmux/preview_target.sh"     "$CONFIG_DIR/tmux/preview_target.sh"
+    for helper in "$REPO_DIR"/config/tmux/tmux.conf "$REPO_DIR"/config/tmux/*.sh "$REPO_DIR"/config/tmux/*.py; do
+        ln -sf "$helper" "$CONFIG_DIR/tmux/$(basename "$helper")"
+    done
     ln -sf "$REPO_DIR/config/btop/btop.conf"             "$CONFIG_DIR/btop/btop.conf"
     ln -sf "$REPO_DIR/config/btop/themes/catppuccin_mocha.theme" "$CONFIG_DIR/btop/themes/catppuccin_mocha.theme"
 
-    # 2. Add Auto-Tmux to Zsh (if missing)
-    if ! grep -q "Auto-Tmux Configuration" "$ZSHRC"; then
-        log_info "Adding missing auto-tmux logic to $ZSHRC..."
-        echo "" >> "$ZSHRC"
-        cat "$REPO_DIR/zsh/auto-tmux.zsh" >> "$ZSHRC"
-    fi
+    # 2. Upgrade managed shell startup, including old copied snippets.
+    python3 "$REPO_DIR/scripts/configure_shell.py" "$ZSHRC" "$REPO_DIR/zsh/auto-tmux.zsh"
 
     # 3. Reload Alacritty
     if [ -f "$CONFIG_DIR/alacritty/alacritty.toml" ]; then
@@ -662,11 +615,19 @@ update_core() {
     # 4. Reload Tmux
     if command -v tmux &> /dev/null && pgrep tmux > /dev/null; then
         log_info "Reloading active Tmux session..."
-        tmux source-file "$CONFIG_DIR/tmux/tmux.conf" > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
+        if tmux source-file "$CONFIG_DIR/tmux/tmux.conf"; then
             log_success "Tmux reloaded."
+            tmux run-shell "python3 \"$CONFIG_DIR/tmux/session_state.py\" save"
+            local session_error
+            session_error="$(tmux show-option -gqv @termi-session-error)"
+            if [ -n "$session_error" ]; then
+                log_warn "Session checkpoint failed: $session_error"
+                return 1
+            fi
+            log_success "Current session checkpoint saved."
         else
-            log_warn "Tmux reload check failed. Check syntax or logs."
+            log_warn "Tmux reload failed. Check the error above."
+            return 1
         fi
 
         if [ -d "$TMUX_PLUGIN_DIR" ]; then
@@ -702,12 +663,13 @@ install_vscode() {
 # --- Main CLI ---
 
 usage() {
-    echo "Usage: $0 {install|uninstall|update|vscode|help}"
+    echo "Usage: $0 {install|uninstall|update|reload|vscode|help}"
     echo
     echo "Commands:"
     echo "  install    Full setup (App installation, config linking, shell setup)"
     echo "  uninstall  Remove configurations and optionally uninstall apps"
     echo "  update     Refresh configurations and symlinks"
+    echo "  reload     Apply local configurations without git pull"
     echo "  vscode     Install VS Code extensions (Theme, Icons)"
     echo "  help       Show this help message"
 }
@@ -721,6 +683,9 @@ case "$1" in
         ;;
     update)
         update_core
+        ;;
+    reload)
+        update_core --local
         ;;
     vscode)
         install_vscode

@@ -41,7 +41,7 @@ save_to_clipboard = true
 
 [keyboard]
 bindings = [
-    # Ctrl+Tab / Ctrl+Shift+Tab → cycle panes in tmux (Mapped to F13/F14)
-    { key = "Tab",  mods = "Control",         chars = "\u001b[25~" }, # Sends F13
-    { key = "Tab",  mods = "Control|Shift",   chars = "\u001b[26~" }, # Sends F14
+    # Ctrl+Tab / Ctrl+Shift+Tab → cycle panes in tmux (explicit User0/User1 sequences)
+    { key = "Tab",  mods = "Control",         chars = "\u001b[25~" }, # tmux User0
+    { key = "Tab",  mods = "Control|Shift",   chars = "\u001b[26~" }, # tmux User1
 ]

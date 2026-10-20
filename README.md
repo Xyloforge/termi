@@ -81,3 +81,44 @@ The `setup.sh` script is your central tool for managing the config.
 - **Update Configs**: `./setup.sh update` (Pull changes & refresh symlinks)
 - **Uninstall**: `./setup.sh uninstall` (Remove all configs & restore shell)
 - **Install VS Code Theme**: `./setup.sh vscode` (Installs extensions)
+
+
+## Session recovery and local upgrades
+
+Apply local changes with `./setup.sh reload`. This refreshes helper links,
+backs up `.zshrc`, replaces the old copied auto-tmux block with a managed
+`source`, and reloads tmux. It does not pull Git changes or install packages.
+Python 3.8+ is required on macOS/Linux/WSL; the installer includes Python.
+
+Opening another terminal attaches to recent live work, regardless of its launch
+directory. On a fresh server, recovery waits for the first session/client and
+runs once. Reloading the configuration does not restore an older snapshot.
+
+Layout changes trigger a checkpoint after a one-second coalescing delay. Closing
+a terminal client also requests a save. Continuum adds a one-minute periodic
+save while the status bar is running. Saves and restores share a crash-released
+file lock. New layout and scrollback files are validated and flushed in a
+separate generation before `last` is atomically replaced. Failed saves leave the
+previous checkpoint usable; failed restores pause saving to protect the source.
+The latest 20 completed generations are retained, along with existing legacy
+snapshots. Named tmux servers have separate default storage.
+
+`Cmd+Z` toggles zoom on the focused pane. `Cmd+A` switches to the previous
+window, including across sessions, with separate history for each terminal
+client. Auto-resize respects manual zoom. These shortcuts have different jobs.
+
+- Save now: **Ctrl+Space, then Ctrl+S**. This waits for an in-progress save.
+- Restore manually: **Ctrl+Space, then Ctrl+R**.
+- Inspect the latest error: `tmux show-option -gqv @termi-session-error`.
+- Locate checkpoints: `tmux show-option -gqv @termi-state-dir`.
+- Inspect last successful save (Unix time): `tmux show-option -gqv @termi-last-save`.
+
+A sudden power loss can still lose changes made after the last completed
+checkpoint. Before restarting deliberately, use Save now and wait for it to
+finish. Recovery restores tmux layouts, directories and scrollback; it does not
+preserve live process memory, SSH connections, or every application's state.
+
+Run regressions with `python3 -m unittest discover -s tests -v`. Tests use
+private tmux sockets and temporary snapshot directories. The restart tests use
+an installed tmux-resurrect plugin (or `TERMI_RESURRECT_PATH`); the full startup
+test also requires TPM at `~/.tmux/plugins/tpm`.
