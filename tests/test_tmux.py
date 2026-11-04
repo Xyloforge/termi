@@ -2,6 +2,7 @@
 import os
 import pathlib
 import pty
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -74,6 +75,44 @@ class TmuxTests(unittest.TestCase):
     def key(self, master, value):
         os.write(master, value)
         time.sleep(.3)
+
+    def test_splits_and_new_windows_follow_focused_pane_after_cd(self):
+        master, tty = self.client('alpha')
+        start = self.base / 'starting directory'
+        start.mkdir()
+        for key, direction in ((b'\x00%', 'right'), (b'\x00"', 'down'), (b'\x00c', 'window')):
+            with self.subTest(direction=direction):
+                current = self.base / (direction + " directory with ' quote")
+                current.mkdir()
+                source = self.t('new-window', '-t', 'alpha', '-c', str(start), '-P', '-F', '#{pane_id}', '/bin/sh')
+                window = self.t('display-message', '-p', '-t', source, '#{window_id}')
+                self.t('send-keys', '-t', source, '-l', 'cd ' + shlex.quote(str(current)))
+                self.t('send-keys', '-t', source, 'Enter')
+                for _ in range(100):
+                    if self.t('display-message', '-p', '-t', source, '#{pane_current_path}') == str(current):
+                        break
+                    time.sleep(.02)
+                self.assertEqual(self.t('display-message', '-p', '-t', source, '#{pane_current_path}'), str(current))
+
+                self.key(master, key)
+                created = self.t('display-message', '-p', '-t', 'alpha', '#{pane_id}')
+                self.assertNotEqual(created, source)
+                self.assertEqual(self.t('display-message', '-p', '-t', created, '#{pane_current_path}'), str(current))
+                created_window = self.t('display-message', '-p', '-t', created, '#{window_id}')
+                if direction == 'window':
+                    self.assertNotEqual(created_window, window)
+                else:
+                    self.assertEqual(created_window, window)
+                    source_xy = self.t('display-message', '-p', '-t', source, '#{pane_left}:#{pane_top}')
+                    created_xy = self.t('display-message', '-p', '-t', created, '#{pane_left}:#{pane_top}')
+                    sx, sy = map(int, source_xy.split(':'))
+                    cx, cy = map(int, created_xy.split(':'))
+                    if direction == 'right':
+                        self.assertGreater(cx, sx)
+                        self.assertEqual(cy, sy)
+                    else:
+                        self.assertEqual(cx, sx)
+                        self.assertGreater(cy, sy)
 
     def test_previous_window_tracks_navigation(self):
         master, tty = self.client('alpha')

@@ -63,15 +63,26 @@ Automated setup that seamlessly installs **WSL (Alpine Linux)** inside, but beha
 
 | Action | macOS | Windows / Linux |
 | :--- | :--- | :--- |
-| **New Tab** | `Cmd + T` | `Ctrl + T` |
-| **Close Tab** | `Cmd + W` | `Alt + Shift + W` |
+| **New Tmux Window** | `Cmd + T` | `Alt + Y` |
+| **New Tmux Session** | `Cmd + Shift + T` | `Ctrl+Space` then `T` |
+| **New Alacritty Tab** | `Cmd + Y` | — |
+| **Close Pane** | `Cmd + W` | `Alt + W` |
+| **Close Tmux Window** | `Cmd + Shift + W` | `Alt + Shift + W` |
 | **Split Right** | `Cmd + D` | `Alt + D` |
 | **Split Down** | `Cmd + Shift + D` | `Alt + Shift + D` |
 | **Navigate Panes** | `Cmd + H/J/K/L` | `Alt + H/J/K/L` |
 | **Maximize Pane** | `Cmd + F` | `Alt + F` |
-| **Rename Tab** | `Cmd + Shift + R` | `Alt + Shift + R` |
+| **Rename Tmux Window** | `Cmd + Shift + R` | `Alt + Shift + R` |
 | **Copy** | `Cmd + C` | `Ctrl + Shift + C` |
 | **Paste** | `Cmd + V` | `Ctrl + Shift + V` |
+
+Tmux windows are workspaces inside the current terminal. New tmux windows and
+splits use the focused pane's current directory, including after `cd`. On macOS,
+the red close button closes a native Alacritty window or tab and leaves tmux work
+running.
+
+New session prompts for a name, then switches into the session in the focused
+pane's current directory. Press `Ctrl+C` to cancel the prompt.
 
 > **Note**: On Windows/Linux, we use `Alt` for window management to avoid conflicts with system shortcuts (like `Win+Arrow` or `Ctrl+C`).
 

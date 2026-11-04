@@ -3,6 +3,10 @@ import = [
     "~/.config/alacritty/alacritty_common.toml"
 ]
 
+[window]
+# Restore the standard macOS close, minimize, and fullscreen buttons.
+decorations = "Full"
+
 [keyboard]
 bindings = [
     # Tmux splits (Prefix = Ctrl+Space = \x00)
@@ -12,7 +16,9 @@ bindings = [
     # Pane/Window management
     { key = "W",     mods = "Command",              chars = "\u0000x" },
     { key = "W",     mods = "Command|Shift",         chars = "\u0000&" },
-    { key = "Y",     mods = "Command",              chars = "\u0000c" },
+    { key = "T",     mods = "Command",              chars = "\u0000c" }, # New tmux window
+    { key = "T",     mods = "Command|Shift",        chars = "\u0000T" }, # New tmux session
+    { key = "Y",     mods = "Command",              action = "CreateNewTab" }, # Native Alacritty tab
 
     # Tmux navigation
     { key = "P",     mods = "Command",              chars = "\u0000s" },

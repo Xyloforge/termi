@@ -9,11 +9,12 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 
 | Action                 | MacOS Shortcut (Alacritty) | Tmux Shortcut         |
 | :--------------------- | :------------------------- | :-------------------- |
-| **New Window**         | `Cmd + Y`                  | `Ctrl+Space` then `c` |
+| **New Tmux Window**    | `Cmd + T`                  | `Ctrl+Space` then `c` |
+| **New Alacritty Tab**  | `Cmd + Y`                  | _(native macOS tab)_ |
 | **Split Right**        | `Cmd + D`                  | `Ctrl+Space` then `%` |
 | **Split Down**         | `Cmd + Shift + D`          | `Ctrl+Space` then `"` |
 | **Close Pane**         | `Cmd + W`                  | `Ctrl+Space` then `x` |
-| **Close Window**       | `Cmd + Shift + W`          | `Ctrl+Space` then `&` |
+| **Close Tmux Window**  | `Cmd + Shift + W`          | `Ctrl+Space` then `&` |
 | **Next Window**        | _(none)_                   | `Ctrl+Space` then `n` |
 | **Previous Window**    | _(none)_                   | `Ctrl+Space` then `p` |
 | **List Windows/Panes** | `Cmd + P`                  | `Ctrl+Space` then `w` |
@@ -21,6 +22,11 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 | **Show Pane Numbers**  | `Cmd + O`                  | `Ctrl+Space` then `q` |
 | **View Pane Content**  | _(none)_                   | `Ctrl+Space` then `p` |
 | **Rename Window**      | `Cmd + Shift + R`          | `Ctrl+Space` then `,` |
+
+New tmux windows and splits start in the focused pane's current directory,
+including after `cd`. A tmux session contains windows; each window contains panes.
+Use the red macOS close button to close a native Alacritty window or tab while
+leaving its tmux work running.
 
 ## 🧭 Navigation
 
@@ -39,6 +45,7 @@ Since we mapped Alacritty keys to Tmux, you have two ways to do everything:
 
 | Action              | Shortcut                                           |
 | :------------------ | :------------------------------------------------- |
+| **New Session**     | `Cmd + Shift + T` or `Ctrl+Space` then `T` (enter a name, then switch into it) |
 | **Detach Session**  | `Ctrl+Space` then `d`                              |
 | **Rename Session**  | `Ctrl+Space` then `$`                              |
 | **Save State**      | `Ctrl+Space` then `Ctrl + s` (Auto-saves every minute + layout changes) |

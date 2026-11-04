@@ -43,7 +43,7 @@ prev_window|  Previous window|Prefix+N
 next_window|  Next window|—
 last_window|  Last (most recent) window|—
 rename_window|  Rename current window|Prefix+R
-new_session|  New session|—
+new_session|  New session|Prefix+T
 detach|  Detach from session|—
 copy_mode|  Enter copy mode (vim selection)|Prefix+v
 log_grabber|  Log grabber (search scrollback)|Prefix+g
@@ -111,7 +111,7 @@ case "$CHOICE" in
     next_window)        tmux next-window ;;
     last_window)        tmux last-window ;;
     rename_window)      defer command-prompt -I "#W" "rename-window '%%'" ;;
-    new_session)        defer command-prompt -p "new session name:" "new-session -d -s '%%'" ;;
+    new_session)        defer command-prompt -F -p "new session name:" 'new-session -s "%%%" -c #{q:pane_current_path}' ;;
     detach)             tmux detach-client ;;
     copy_mode)          defer copy-mode -t "$PANE_ID" ;;
     log_grabber)        defer display-popup -E -w 80% -h 90% "~/.config/tmux/log_grabber.sh" ;;
